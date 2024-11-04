@@ -1,0 +1,6 @@
+@Obchod.Server_HostAddress = http://localhost:5022
+
+GET {{Obchod.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
