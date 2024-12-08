@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
+import { useForm } from "@mantine/form"
+import registrationForm from "../core/form/registrationForm"
+import { useRegistrationQuery } from '../api/query/useRegistrationQuery';
 
 function Register() {
-
     document.title = "Register";
+    const form = useForm(registrationForm);
+    const useRegistrationQuery = useRe
 
     // dont ask an already registered user to register over and over again
     useEffect(() => {
@@ -44,11 +48,10 @@ function Register() {
             </div>
         </section>
     );
-    async function registerHandler(e) {
+    async function registerHandler(e : any) {
         e.preventDefault();
         const form_ = e.target, submitter = document.querySelector("input.login");
-
-        const formData = new FormData(form_, submitter), dataToSend = {};
+        const formData = new FormData(form_, submitter ), dataToSend: any = {};
 
         for (const [key, value] of formData) {
             dataToSend[key] = value;

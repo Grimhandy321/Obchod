@@ -53,8 +53,8 @@ function Login() {
             dataToSend[key] = value;
         }
 
-        if (dataToSend?.Remember === "on") {
-            dataToSend?.Remember = true;
+        if (dataToSend.Remember === "on") {
+            dataToSend.Remember = true;
         }
 
         console.log("login data before send: ", dataToSend);
@@ -71,7 +71,7 @@ function Login() {
         const data = await response.json();
 
         if (response.ok) {
-            localStorage.setItem("user", dataToSend?.Email);
+            localStorage.setItem("user", dataToSend.Email);
             document.location = "/";
         }
 
