@@ -13,18 +13,18 @@ export namespace useRegistrationQuery
         description: string;
     }
     export interface Props {
-        formValues: any
+        values: any
     }
 }
-export const useRegistrationQuery = ({ formValues }: useRegistrationQuery.Props) =>
+export const useRegistrationQuery = ({ values }: useRegistrationQuery.Props) =>
 {
     const axiosClient = useAxiosClient();
     return useQuery({
-        queryKey: ['/api/securewebsite/register', formValues],
-        enabled: !!formValues,
+        queryKey: ['/api/securewebsite/register', values],
+        enabled: !!values,
         queryFn: async (): Promise<useRegistrationQuery.Result> =>
         {
-            const { data } = await axiosClient.post('/api/securewebsite/register/' + formValues);
+            const { data } = await axiosClient.post('/api/securewebsite/register/' + values);
             return data;
         }
     });
