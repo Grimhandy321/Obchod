@@ -1,5 +1,4 @@
-import { createBrowserRouter, Route, RouterProvider } from "react-router-dom";
-import DefaultLayout from "./DefaultLayout";
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
 import ProtectedRoutes from "../core/ProtectedRoutes";
 import Home from "../pages/Home";
 import Admin from "../pages/Admin";
@@ -33,3 +32,4 @@ const router = createBrowserRouter(
 export function Router() {
     return <RouterProvider router={router} />;
 }
+

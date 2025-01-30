@@ -13,4 +13,9 @@
     <Folder Include="src\components\" />
     <Folder Include="src\layout\" />
   </ItemGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties tsconfig_1node_1json__JsonSchema="https://json.schemastore.org/typingsrc.json" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

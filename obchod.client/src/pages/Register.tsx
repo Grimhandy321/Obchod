@@ -5,7 +5,6 @@ import { Button, Group, TextInput } from '@mantine/core';
 function Register() {
     document.title = "Register";
     const form = useForm({
-        mode: 'uncontrolled',
         initialValues: {
             email: '',
             username: '',
@@ -13,7 +12,7 @@ function Register() {
         },
 
         validate: {
-            passwordHash: (value) => (/^(?=.*[A-Z])(?=.*\d)(?=.*\W).{6,}$/.test(value) ? null : 'Invalid email'),
+            passwordHash: (value) => (/^(?=.*[A-Z])(?=.*\d)(?=.*\W).{6,}$/.test(value) ? null : 'Password'),
             username: (value) => value ? null : 'Cant be Epmty',
         },
     });
@@ -45,8 +44,6 @@ function Register() {
                 label="password"
                 {...form.getInputProps('passwordHash')}
             />
-            
-
             <Group justify="flex-end" mt="md">
                 <Button type="submit">Submit</Button>
             </Group>
