@@ -1,22 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useAdminQuery } from '../api/query/useAdminQuery';
+import { useQuerySuccess } from '../lib/useQuerySuccess';
 
 function Admin() {
 
     document.title = "Admin";
     const [partners, setPartners] = useState([]);
+    const useAdminResult = useAdminQuery();
 
-    useEffect(() => {
-
-        fetch("api/SecureWebsite/admin", {
-            method: "GET",
-            credentials: "include"
-        }).then(response => response.json()).then(data => {
-            setPartners(data.trustedPartners);
-            console.log("trustedPartners: ", data.trustedPartners);
-        }).catch(error => {
-            console.log("Error home page: ", error);
-        });
-    }, []);
+    useQuerySuccess(useAdminResult, async (data) => {
+        setPartners(data.trustedPartners);
+    });
     return (
         <section className='admin-page page'>
             <header>

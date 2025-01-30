@@ -1,22 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useHomeQuery } from '../api/query/useHomeQuery';
+import { useQuerySuccess } from '../lib/useQuerySuccess';
 
 function Home() {
 
     document.title = "Welcome";
-    const [userInfo, setUserInfo] = useState({});
+    const [userInfo, setUserInfo] = useState<useHomeQuery.Result>({});
+    const useHomeQueryResult = useHomeQuery({user:localStorage.getItem("user") });
 
-    useEffect(() => {
-        const user = localStorage.getItem("user");
-        fetch("api/SecureWebsite/home/" + user, {
-            method: "GET",
-            credentials: "include"
-        }).then(response => response.json()).then(data => {
-            setUserInfo(data.userInfo);
-            console.log("user info: ", data.userInfo);
-        }).catch(error => {
-            console.log("Error home page: ", error);
-        });
-    }, []);
+    useQuerySuccess(useHomeQueryResult, async (data) => {
+        setUserInfo(data);
+    })
+
     return (
         <section className='page'>
             <header>

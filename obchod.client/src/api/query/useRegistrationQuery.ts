@@ -1,4 +1,4 @@
-import {useAxiosClient} from "../axios-client";
+import {useAxiosClient} from "../../lib/axios-client";
 import { useQuery } from "@tanstack/react-query";
 
 export namespace useRegistrationQuery
