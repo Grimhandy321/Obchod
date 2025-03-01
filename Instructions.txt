@@ -1,0 +1,3 @@
+in server run Update-Database -Force
+in client run npm install 
+run the projekt using the button in visual studio
