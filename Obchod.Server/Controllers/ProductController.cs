@@ -1,12 +1,9 @@
-using backend.Models;
-using backend.Repositories;
+
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+using Obchod.Server.Models;
+using Obchod.Server.Repositories;
+
 
 
 namespace Obchod.Server.Controllers

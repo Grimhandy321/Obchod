@@ -1,7 +1,7 @@
 ﻿using Obchod.Server.Models;
-using Repositories;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Obchod.Server.Repositories;
 
 namespace Obchod.Server.Controllers
 {

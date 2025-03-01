@@ -1,7 +1,8 @@
-﻿using backend.Models;
-using backend.Repositories;
+﻿
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Obchod.Server.Models;
+using Obchod.Server.Repositories;
 
 namespace Obchod.Server.Controllers
 {

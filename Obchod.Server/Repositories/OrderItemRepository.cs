@@ -1,6 +1,7 @@
-﻿using Obchod.Server.Models;
+﻿using Microsoft.Data.SqlClient;
+using Obchod.Server.Models;
 using System.Data;
-using System.Data.SqlClient;
+
 
 namespace Obchod.Server.Repositories
 {
