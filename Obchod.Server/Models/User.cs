@@ -1,8 +1,11 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
 
 namespace Obchod.Server.Models
 {
-    public class User
+    public class User : IdentityUser
     {
         public int UserID { get; }
         public string FirstName { get; set; }
@@ -10,7 +13,6 @@ namespace Obchod.Server.Models
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Password { get; set; }
-
         public string Address { get; set; }
         public string City { get; set; }
         public string PostalCode { get; set; }

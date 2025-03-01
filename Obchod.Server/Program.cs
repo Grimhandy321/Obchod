@@ -1,7 +1,5 @@
-
-using Microsoft.EntityFrameworkCore;
-using Obchod.Server.Data;
 using Obchod.Server.Models;
+using Obchod.Server.Repositories;
 
 namespace Obchod.Server
 {
@@ -11,43 +9,34 @@ namespace Obchod.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+
             // Add services to the container.
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin()
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                                  });
+            });
+
+            builder.Services.AddScoped<IRepository<User>, UserRepository>();
+            builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
+
+            builder.Services.AddScoped<IListRepository<Order>, OrderRepository>();
+            builder.Services.AddScoped<IListRepository<ProductSize>, ProductSizeRepository>();
+            builder.Services.AddScoped<IListRepository<OrderItem>, OrderItemRepository>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddAuthorization();
-            builder.Services.AddDbContext<ApplicationDbContext>(options => {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS"));
-            });
-
-            builder.Services.AddIdentityApiEndpoints<User>().AddEntityFrameworkStores<ApplicationDbContext>();
-
-            builder.Services.AddIdentityCore<User>(options => {
-                options.SignIn.RequireConfirmedAccount = true;
-                options.Password.RequireDigit = true;
-                options.Password.RequireNonAlphanumeric = true;
-                options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 0;
-
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-
-                // User settings.
-                options.User.AllowedUserNameCharacters =
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-                options.User.RequireUniqueEmail = true;
-
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
-
-
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -56,14 +45,14 @@ namespace Obchod.Server
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("_myAllowSpecificOrig   ins");
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-            app.MapIdentityApi<User>();
+
 
             app.MapControllers();
-
-            app.MapFallbackToFile("/index.html");
 
             app.Run();
         }
