@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Obchod.Server.Models;
 using Obchod.Server.Repositories;
