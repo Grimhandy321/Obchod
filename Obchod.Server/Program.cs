@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Obchod.Server.Models;
 using Obchod.Server.Repositories;
 
@@ -23,6 +24,8 @@ namespace Obchod.Server
                                             .AllowAnyMethod();
                                   });
             });
+
+            builder.Services.AddDbContext<MyDbContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
 
             builder.Services.AddScoped<IRepository<User>, UserRepository>();
             builder.Services.AddScoped<IRepository<Product>, ProductRepository>();

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Obchod.Server.Models
 {
-    public class User : IdentityUser
+    public class User 
     {
         public int UserID { get; }
         public string FirstName { get; set; }

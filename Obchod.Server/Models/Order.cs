@@ -1,4 +1,6 @@
-﻿namespace Obchod.Server.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Obchod.Server.Models
 {
     public enum OrderStatus
     {
@@ -13,6 +15,8 @@
     {
         public int OrderID { get; set; }
         public DateTime DateTime { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
         public OrderStatus Status { get; set; }
         public int UserID { get; set; }
