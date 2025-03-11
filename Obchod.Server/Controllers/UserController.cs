@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
@@ -28,7 +29,7 @@ namespace Obchod.Server.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<User> users = _dbContext.users;
+            IEnumerable<User> users = _dbContext.users.ToList();
             return Ok(users);
         }
 
@@ -83,10 +84,10 @@ namespace Obchod.Server.Controllers
         }
 
         [HttpDelete("{userId}")]
-        public IActionResult Delete(int userId)
+        public IActionResult Delete(string userId)
         {
-            bool deleted = _userRepository.Delete(userId);
-            if (deleted)
+            int deleted = _dbContext.users.FirstOrDefault(x => x.Id == userId).ExecuteDelete();
+            if (deleted > 0)
             {
                 return Ok();
             }
@@ -99,19 +100,15 @@ namespace Obchod.Server.Controllers
             [HttpPost("login")]
             public IActionResult Login(UserLoginRequest loginRequest)
             {
-                var user = _userRepository.GetAll().FirstOrDefault(u => u.Email == loginRequest.Email);
-
-                if (user == null || !user.CheckPassword(loginRequest.Password))
+                var user = _dbContext.users.FirstOrDefault(x => loginRequest.Password == x.PasswordHash && x.Email == loginRequest.Email);
+                if (user == null)
                 {
                     return Unauthorized("Invalid username or password");
                 }
-
                 var jwtService = new JwtService(_configuration);
                 var token = jwtService.GenerateJwtToken(user);
-
                 return Ok(new { Token = token });
             }
-
         }
 }
     
