@@ -5,33 +5,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Obchod.Server.Models
 {
-    public class User 
+    public class User : IdentityUser
     {
-        public int UserID { get; }
+        [MaxLength(50)]
         public string FirstName { get; set; }
+        [MaxLength(50)]
         public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string Password { get; set; }
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string PostalCode { get; set; }
 
-        public User(int userId, string firstName, string lastName, string email, string phone, string password, string address = null, string city = null, string postalCode = null)
-        {
-            UserID = userId;
-            FirstName = firstName;
-            LastName = lastName;
-            Email = email;
-            Phone = phone;
-            Password = password;
-            Address = address;
-            City = city;
-            PostalCode = postalCode;
-        }
-        public bool CheckPassword(string password)
-        {
-            return Password == password; // temporary
-        }
+        [Column(TypeName = "datetime")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
+        [Column(TypeName = "datetime")]
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+
+        [Column(TypeName = "datetime")]
+        public DateTime LastLogin { get; set; } = DateTime.Now;
+
+        public bool IsAdmin { get; set; } = false;
     }
 }

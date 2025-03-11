@@ -9,5 +9,10 @@ namespace Obchod.Server.Models
 
         }
         public DbSet<Order> orders { get; set; }
+        public DbSet<OrderItem> orderItems { get; set; }
+        public DbSet <Product> products { get; set; } 
+        public DbSet<User> users { get; set; }
+        public DbSet <UserLoginRequest> userLoginRequests { get; set; }
+        public DbSet <Login> logins { get; set; }
     }
 }

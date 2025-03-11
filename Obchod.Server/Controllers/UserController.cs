@@ -17,25 +17,25 @@ namespace Obchod.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IRepository<User> _userRepository;
+        private readonly MyDbContext _dbContext;
 
-        public UserController(IConfiguration configuration, IRepository<User> userRepository)
+        public UserController(IConfiguration configuration, MyDbContext dbContext)
         {
             _configuration = configuration;
-            _userRepository = userRepository;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<User> users = _userRepository.GetAll();
+            IEnumerable<User> users = _dbContext.users;
             return Ok(users);
         }
 
         [HttpGet("{userId}")]
-        public IActionResult Get(int userId)
+        public IActionResult Get(string userId)
         {
-            var user = _userRepository.GetById(userId);
+            var user = _dbContext.users.First(x => x.Id == userId);
             if (user == null)
             {
                 return NotFound();
@@ -46,13 +46,26 @@ namespace Obchod.Server.Controllers
         [HttpPost]
         public IActionResult Post(User newUser)
         {
-            bool added = _userRepository.Add(newUser);
-            if (!added)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Failed to add user");
+                return BadRequest(ModelState);
             }
-
-            return Ok();
+            var objUser = _dbContext.users.FirstOrDefault(x => x.Email == newUser.Email);
+            if (objUser == null)
+            {
+                _dbContext.users.Add(new User
+                {
+                    FirstName = newUser.FirstName,
+                    LastName = newUser.LastName,
+                    Email = newUser.Email,
+                    PasswordHash = newUser.PasswordHash
+                });
+                _dbContext.SaveChanges();
+                return Ok("Registration Successfull");
+            }
+            else {
+                return BadRequest("User allready exists");
+            }
         }
 
         [HttpPut("{userId}")]
