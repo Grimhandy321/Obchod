@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
-using Obchod.Server.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -70,44 +69,53 @@ namespace Obchod.Server.Controllers
         }
 
         [HttpPut("{userId}")]
-        public IActionResult Put(User updatedUser)
+        public IActionResult Put(string userId, [FromBody] User updatedUser)
         {
-            bool updated = _userRepository.Update(updatedUser);
-            if (updated)
+            if (userId != updatedUser.Id)
             {
-                return Ok();
+                return BadRequest("User ID in URL does not match body");
             }
-            else
+
+            var existingUser = _dbContext.users.Find(userId);
+            if (existingUser == null)
             {
                 return NotFound();
             }
+
+            _dbContext.Entry(existingUser).CurrentValues.SetValues(updatedUser);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
+
 
         [HttpDelete("{userId}")]
-        public IActionResult Delete(string userId)
+        public IActionResult Delete(int userId)
         {
-            int deleted = _dbContext.users.FirstOrDefault(x => x.Id == userId).ExecuteDelete();
-            if (deleted > 0)
-            {
-                return Ok();
-            }
-            else
+            var user = _dbContext.users.Find(userId);
+            if (user == null)
             {
                 return NotFound();
             }
+
+            _dbContext.users.Remove(user);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
 
-            [HttpPost("login")]
-            public IActionResult Login(UserLoginRequest loginRequest)
+
+        [HttpPost("login")]
+        public IActionResult Login(UserLoginRequest loginRequest)
+        {
+            var user = _dbContext.users.FirstOrDefault(x => loginRequest.Password == x.PasswordHash && x.Email == loginRequest.Email);
+            if (user == null)
             {
-                var user = _dbContext.users.FirstOrDefault(x => loginRequest.Password == x.PasswordHash && x.Email == loginRequest.Email);
-                if (user == null)
-                {
-                    return Unauthorized("Invalid username or password");
-                }
-                var jwtService = new JwtService(_configuration);
-                var token = jwtService.GenerateJwtToken(user);
-                return Ok(new { Token = token });
+                return Unauthorized("Invalid username or password");
+            }
+            var jwtService = new JwtService(_configuration);
+            var token = jwtService.GenerateJwtToken(user);
+            return Ok(new { Token = token });
             }
         }
 }

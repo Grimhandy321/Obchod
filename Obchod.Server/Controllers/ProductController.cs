@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Obchod.Server.Models;
-using Obchod.Server.Repositories;
 
 
 
@@ -14,24 +13,24 @@ namespace Obchod.Server.Controllers
 
     public class ProductController : ControllerBase
     {
-        private readonly IRepository<Product> _productRepository;
+        private readonly MyDbContext _dbContext;
 
-        public ProductController(IRepository<Product> productRepository)
+        public ProductController(MyDbContext dbContext)
         {
-            _productRepository = productRepository;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<Product> products = _productRepository.GetAll();
+            IEnumerable<Product> products = _dbContext.products.ToList();
             return Ok(products);
         }
 
         [HttpGet("{productId}")]
         public IActionResult Get(int productId)
         {
-            var product = _productRepository.GetById(productId);
+            var product = _dbContext.products.FirstOrDefault(x => x.ProductID == productId);
             if (product == null)
             {
                 return NotFound();
@@ -42,7 +41,8 @@ namespace Obchod.Server.Controllers
         [HttpPost]
         public IActionResult Post(Product product)
         {
-            _productRepository.Add(product);
+            _dbContext.products.Add(product);
+            _dbContext.SaveChanges();
             return Ok();
         }
 

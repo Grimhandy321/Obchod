@@ -26,14 +26,6 @@ namespace Obchod.Server
             });
 
             builder.Services.AddDbContext<MyDbContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
-
-            builder.Services.AddScoped<IRepository<User>, UserRepository>();
-            builder.Services.AddScoped<IRepository<Product>, ProductRepository>();
-
-            builder.Services.AddScoped<IListRepository<Order>, OrderRepository>();
-            builder.Services.AddScoped<IListRepository<ProductSize>, ProductSizeRepository>();
-            builder.Services.AddScoped<IListRepository<OrderItem>, OrderItemRepository>();
-
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
