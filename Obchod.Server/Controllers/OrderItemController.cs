@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Obchod.Server.Models;
-using Obchod.Server.Repositories;
 
 namespace Obchod.Server.Controllers
 {
@@ -10,25 +9,25 @@ namespace Obchod.Server.Controllers
     [EnableCors("_myAllowSpecificOrigins")]
     public class OrderItemController : ControllerBase
     {
-        private readonly IListRepository<OrderItem> _orderItemRepo;
+        private readonly MyDbContext _dbContext;
 
-        public OrderItemController(IListRepository<OrderItem> orderItemRepo)
+        public OrderItemController(MyDbContext dbContext)
         {
-            _orderItemRepo = orderItemRepo;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<OrderItem> orderItems = _orderItemRepo.GetAll();
+            var orderItems = _dbContext.orderItems.ToList();
             return Ok(orderItems);
         }
 
         [HttpGet("{orderId}")]
         public IActionResult Get(int orderId)
         {
-            var orderItems = _orderItemRepo.GetById(orderId);
-            if (orderItems == null)
+            var orderItems = _dbContext.orderItems.Where(oi => oi.OrderID == orderId).ToList();
+            if (!orderItems.Any())
             {
                 return NotFound();
             }
@@ -36,43 +35,46 @@ namespace Obchod.Server.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post(OrderItem orderItem)
+        public IActionResult Post([FromBody] OrderItem orderItem)
         {
-            bool added = _orderItemRepo.Add(orderItem);
-            if (!added)
-            {
-                return BadRequest("Failed to add Order Item");
-            }
-
-            return Ok();
+            _dbContext.orderItems.Add(orderItem);
+            _dbContext.SaveChanges();
+            return CreatedAtAction(nameof(Get), new { orderId = orderItem.OrderID }, orderItem);
         }
 
         [HttpPut("{orderItemId}")]
-        public IActionResult Put(OrderItem orderItem)
+        public IActionResult Put(int orderItemId, [FromBody] OrderItem orderItem)
         {
-            bool updated = _orderItemRepo.Update(orderItem);
-            if (updated)
+            if (orderItemId != orderItem.OrderItemID)
             {
-                return Ok();
+                return BadRequest("Order Item ID in URL does not match body");
             }
-            else
+
+            var existingOrderItem = _dbContext.orderItems.Find(orderItemId);
+            if (existingOrderItem == null)
             {
                 return NotFound();
             }
+
+            _dbContext.Entry(existingOrderItem).CurrentValues.SetValues(orderItem);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
 
         [HttpDelete("{orderItemId}")]
         public IActionResult Delete(int orderItemId)
         {
-            bool deleted = _orderItemRepo.Delete(orderItemId);
-            if (deleted)
-            {
-                return Ok();
-            }
-            else
+            var orderItem = _dbContext.orderItems.Find(orderItemId);
+            if (orderItem == null)
             {
                 return NotFound();
             }
+
+            _dbContext.orderItems.Remove(orderItem);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Obchod.Server.Models;
-using Obchod.Server.Repositories;
 
 namespace Obchod.Server.Controllers
 {
@@ -10,25 +9,25 @@ namespace Obchod.Server.Controllers
     [EnableCors("_myAllowSpecificOrigins")]
     public class ProductSizeController : ControllerBase
     {
-        private readonly IListRepository<ProductSize> _psRepository;
+        private readonly MyDbContext _dbContext;
 
-        public ProductSizeController(IListRepository<ProductSize> productSizeRepo)
+        public ProductSizeController(MyDbContext dbContext)
         {
-            _psRepository = productSizeRepo;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<ProductSize> productSizes = _psRepository.GetAll();
+            var productSizes = _dbContext.productSizes.ToList();
             return Ok(productSizes);
         }
 
         [HttpGet("{productId}")]
         public IActionResult Get(int productId)
         {
-            var productSizes = _psRepository.GetById(productId);
-            if (productSizes == null)
+            var productSizes = _dbContext.productSizes.Where(ps => ps.ProductID == productId).ToList();
+            if (!productSizes.Any())
             {
                 return NotFound();
             }
@@ -38,52 +37,55 @@ namespace Obchod.Server.Controllers
         [HttpGet("{id}/size")]
         public IActionResult GetProductSizeById(int id)
         {
-            var productSizes = _psRepository.GetObjById(id);
-            if (productSizes == null)
+            var productSize = _dbContext.productSizes.Find(id);
+            if (productSize == null)
             {
                 return NotFound();
             }
-            return Ok(productSizes);
+            return Ok(productSize);
         }
 
         [HttpPost]
-        public IActionResult Post(ProductSize newProductSize)
+        public IActionResult Post([FromBody] ProductSize newProductSize)
         {
-            bool added = _psRepository.Add(newProductSize);
-            if (!added)
-            {
-                return BadRequest("Failed to add Product Size");
-            }
-
-            return Ok();
+            _dbContext.productSizes.Add(newProductSize);
+            _dbContext.SaveChanges();
+            return CreatedAtAction(nameof(GetProductSizeById), new { id = newProductSize.Id }, newProductSize);
         }
 
         [HttpPut("{productSizeId}")]
-        public IActionResult Put(ProductSize updatedProductSize)
+        public IActionResult Put(int productSizeId, [FromBody] ProductSize updatedProductSize)
         {
-            bool updated = _psRepository.Update(updatedProductSize);
-            if (updated)
+            if (productSizeId != updatedProductSize.ProductSizeID)
             {
-                return Ok();
+                return BadRequest("Product Size ID in URL does not match body");
             }
-            else
+
+            var existingProductSize = _dbContext.productSizes.Find(productSizeId);
+            if (existingProductSize == null)
             {
                 return NotFound();
             }
+
+            _dbContext.Entry(existingProductSize).CurrentValues.SetValues(updatedProductSize);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
 
         [HttpDelete("{productSizeId}")]
         public IActionResult Delete(int productSizeId)
         {
-            bool deleted = _psRepository.Delete(productSizeId);
-            if (deleted)
-            {
-                return Ok();
-            }
-            else
+            var productSize = _dbContext.productSizes.Find(productSizeId);
+            if (productSize == null)
             {
                 return NotFound();
             }
+
+            _dbContext.productSizes.Remove(productSize);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
     }
 }
