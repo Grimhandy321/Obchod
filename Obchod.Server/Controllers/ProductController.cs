@@ -47,31 +47,33 @@ namespace Obchod.Server.Controllers
         }
 
         [HttpPut("{productId}")]
-        public IActionResult Put(Product updatedProduct)
+        public IActionResult Put(string productId, [FromBody] Product updatedProduct)
         {
-            bool updated = _productRepository.Update(updatedProduct);
-            if (updated)
-            {
-                return Ok();
-            }
-            else
+            var product = _dbContext.products.Find(productId);
+            if (product == null)
             {
                 return NotFound();
             }
+
+            _dbContext.products.Remove(product);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
 
         [HttpDelete("{productId}")]
-        public IActionResult Delete(int productId)
+        public IActionResult Delete(string productId)
         {
-            bool deleted = _productRepository.Delete(productId);
-            if (deleted)
-            {
-                return Ok();
-            }
-            else
+            var product = _dbContext.products.Find(productId);
+            if (product == null)
             {
                 return NotFound();
             }
+
+            _dbContext.products.Remove(product);
+            _dbContext.SaveChanges();
+
+            return Ok();
         }
     }
 }
