@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Obchod.Server.Models
 {
@@ -13,6 +14,7 @@ namespace Obchod.Server.Models
 
     public class Order
     {
+        [Key]
         public int OrderID { get; set; }
         public DateTime DateTime { get; set; }
 

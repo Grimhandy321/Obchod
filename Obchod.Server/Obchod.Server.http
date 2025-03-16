@@ -1,6 +1,8 @@
-@Obchod.Server_HostAddress = http://localhost:5022
+@Obchod.Server_HostAddress = http://localhost:7102
 
-GET {{Obchod.Server_HostAddress}}/weatherforecast/
-Accept: application/json
+GET http://localhost:7102/testToken
+Accept: a
 
 ###
+
+

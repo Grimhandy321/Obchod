@@ -50,7 +50,7 @@ namespace Obchod.Server.Controllers
         {
             _dbContext.productSizes.Add(newProductSize);
             _dbContext.SaveChanges();
-            return CreatedAtAction(nameof(GetProductSizeById), new { id = newProductSize.Id }, newProductSize);
+            return CreatedAtAction(nameof(GetProductSizeById), new { id = newProductSize.ProductSizeID }, newProductSize);
         }
 
         [HttpPut("{productSizeId}")]

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Obchod.Server.Controllers
 {
@@ -10,6 +11,15 @@ namespace Obchod.Server.Controllers
         public string GetAll()
         {
             return "asd";
+        }
+
+
+        [HttpGet]
+        [Authorize]
+        [Route("/testToken")]
+        public IActionResult GetSecureData()
+        {
+            return Ok(new { Message = "This is a secure endpoint" });
         }
     }
 }

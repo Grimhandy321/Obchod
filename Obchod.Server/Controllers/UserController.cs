@@ -1,12 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Obchod.Server.Controllers
 {
@@ -108,10 +103,21 @@ namespace Obchod.Server.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserLoginRequest loginRequest)
         {
-            var user = _dbContext.users.FirstOrDefault(x => loginRequest.Password == x.PasswordHash && x.Email == loginRequest.Email);
-            if (user == null)
+            var user = _dbContext.users.FirstOrDefault(x =>  x.Email == loginRequest.Email);
+            if (user == null) {
+                return Ok(new
+                {
+                    status = "error",
+                    message = "user not found"
+                });
+            }
+            if (user.PasswordHash != loginRequest.Password)
             {
-                return Unauthorized("Invalid username or password");
+                return Ok(new
+                {
+                    status = "error",
+                    message = "invalid password"
+                });
             }
             var jwtService = new JwtService(_configuration);
             var token = jwtService.GenerateJwtToken(user);

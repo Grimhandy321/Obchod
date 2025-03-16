@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from "@mantine/form"
-import { Button, Group, TextInput } from '@mantine/core';
+import { Button, Container, Group,Paper,TextInput,PasswordInput,Checkbox   } from '@mantine/core';
 
 function Register() {
     document.title = "Register";
@@ -26,28 +26,18 @@ function Register() {
     }, []);
 
     return (
-        <form onSubmit={form.onSubmit((values) => console.log(values))}>
-            <TextInput
-                withAsterisk
-                label="Email"
-                placeholder="your@email.com"
-                {...form.getInputProps('email')}
-            />
-            <TextInput
-                withAsterisk
-                label="your username"
-                placeholder="your username"
-                {...form.getInputProps('username')}
-            />
-            <TextInput
-                withAsterisk
-                label="password"
-                {...form.getInputProps('passwordHash')}
-            />
-            <Group justify="flex-end" mt="md">
-                <Button type="submit">Submit</Button>
-            </Group>
-        </form>
+        <Container size={600} my={40}>
+            <Paper withBorder shadow="md" p={30} mt={30} radius="md">
+                <TextInput label="Email" placeholder="you@mantine.dev" required />
+                <PasswordInput label="Password" placeholder="Your password" required mt="md" />
+                <Group justify="space-between" mt="lg">
+          
+                </Group>
+                <Button fullWidth mt="xl">
+                    Sign in
+                </Button>
+            </Paper>
+        </Container>
     );
     
 }

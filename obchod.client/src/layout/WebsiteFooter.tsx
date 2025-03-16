@@ -1,6 +1,6 @@
 function WebsiteFooter() {
   return (
-    <p>Hello world!</p>
+    <p></p>
   );
 }
 

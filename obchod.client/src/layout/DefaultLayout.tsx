@@ -1,22 +1,42 @@
 import {
-    Box,
-    Container
+    AppShell,
+    Burger,
+    Group,
+    UnstyledButton,
 } from "@mantine/core";
+import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from "react-router-dom";
-import { WebsiteFooter } from "./WebsiteFooter";
+import classes from '../style/MobileNavbar.module.css';
 import { WebsiteHeader } from "./WebsiteHeader";
 
+
 export default function DefaultLayout() {
+    const [opened, { toggle }] = useDisclosure();
+
+    const buttons = [
+        <UnstyledButton mx={"xs"} className={classes.control}>Home</UnstyledButton>,
+        <UnstyledButton mx={"xs"} className={classes.control}>Blog</UnstyledButton>,
+        <UnstyledButton mx={"xs"} className={classes.control}>Contacts</UnstyledButton>,
+        <UnstyledButton mx={"xs"}  className={classes.control}>Support</UnstyledButton>,
+    ]
+
     return (
-        <>
-            <Container size={"100vw"} p={0} m={0}>
-                <WebsiteHeader />
-                <Box mx={20}>
-                    <Outlet />
-                </Box>
-                <div id={"consent_blackbar"}></div>
-            </Container>
-            <WebsiteFooter />
-        </>
+        <AppShell
+            header={{ height: 60 }}
+            navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
+            padding="md"
+        >
+            <AppShell.Header>
+                <WebsiteHeader/>
+            </AppShell.Header>
+
+            <AppShell.Navbar py="md" px={4}>
+                {buttons}
+            </AppShell.Navbar>
+     
+            <AppShell.Main>
+                <Outlet/>
+            </AppShell.Main>
+        </AppShell>
     );
 }

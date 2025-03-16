@@ -29,14 +29,10 @@ namespace Obchod.Server
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.FirstName),
                     new Claim(ClaimTypes.Surname, user.LastName),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.MobilePhone, user.Phone),
-                    new Claim(ClaimTypes.StreetAddress, user.Address ?? ""),    
-                    new Claim(ClaimTypes.Locality, user.City ?? ""),
-                    new Claim(ClaimTypes.PostalCode, user.PostalCode ?? "")
+                    new Claim(ClaimTypes.Email, user.Email),  
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 NotBefore = DateTime.UtcNow,

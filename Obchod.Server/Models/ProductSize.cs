@@ -1,7 +1,10 @@
-﻿namespace Obchod.Server.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Obchod.Server.Models
 {
     public class ProductSize
     {
+        [Key]
         public int ProductSizeID { get; set; }
         public int Size { get; set; }
         public decimal Price { get; set; }
