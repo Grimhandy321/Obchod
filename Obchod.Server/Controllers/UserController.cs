@@ -56,10 +56,15 @@ namespace Obchod.Server.Controllers
                     PasswordHash = newUser.PasswordHash
                 });
                 _dbContext.SaveChanges();
-                return Ok("Registration Successfull");
+                return Ok(new {
+                    status = "success"
+                });
             }
             else {
-                return BadRequest("User allready exists");
+                return Ok(new { 
+                    status = "error",
+                    message = "User exists"
+                });
             }
         }
 
@@ -121,7 +126,10 @@ namespace Obchod.Server.Controllers
             }
             var jwtService = new JwtService(_configuration);
             var token = jwtService.GenerateJwtToken(user);
-            return Ok(new { Token = token });
+            return Ok(new {
+                status = "success",
+                Token = token 
+            });
             }
         }
 }

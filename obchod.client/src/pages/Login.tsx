@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
 import {
     Anchor,
     Button,
-    Checkbox,
     Container,
     Group,
     Paper,
@@ -11,19 +9,16 @@ import {
     TextInput,
     Title,
 } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { useAxiosClient } from '../lib/axios-client';
+import { loginForm } from '../lib/form/loginForms';
 function Login() {
-
     document.title = "Login";
-
-    useEffect(() => {
-        const user = localStorage.getItem("user");
-        if (user) {
-            document.location = "/";
-        }
-    }, []);
+    const form = useForm(loginForm);
+    const client = useAxiosClient();
 
     return (
-        <Container size={420} my={40}>
+        <Container size={600} my={40}>
             <Title ta="center" >
                 Welcome back!
             </Title>
@@ -35,15 +30,42 @@ function Login() {
             </Text>
 
             <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-                <TextInput label="Email" placeholder="you@mantine.dev" required />
-                <PasswordInput label="Password" placeholder="Your password" required mt="md" />
+                <TextInput
+                    label="Email"
+                    placeholder="you@mantine.dev"
+                    required
+                    {...form.getInputProps("email")}
+                />
+                <PasswordInput
+                    label="Password"
+                    placeholder="Your password"
+                    required
+                    mt="md"
+                    {...form.getInputProps("password")}
+                />
                 <Group justify="space-between" mt="lg">
-                    <Checkbox label="Remember me" />
-                    <Anchor component="button" size="sm">
+                    <Anchor
+                        component="button"
+                        size="sm"
+                    >
                         Forgot password?
                     </Anchor>
                 </Group>
-                <Button fullWidth mt="xl">
+                <Button
+                    fullWidth
+                    mt="xl"
+                    onClick={() => {
+                        form.validate();
+                        console.log(form)
+                        if (form.isValid())
+                        {
+                            client.post('api/User/login', form.values,
+                                {
+                                    headers: { 'Content-Type': 'application/json' }
+                                });
+                        }
+                    }}
+                >
                     Sign in
                 </Button>
             </Paper>

@@ -1,16 +1,11 @@
 import { useState } from 'react';
-import { useAdminQuery } from '../api/query/useAdminQuery';
 import { useQuerySuccess } from '../lib/useQuerySuccess';
 
 function Admin() {
 
     document.title = "Admin";
     const [partners, setPartners] = useState([]);
-    const useAdminResult = useAdminQuery();
 
-    useQuerySuccess(useAdminResult, async (data) => {
-        setPartners(data.trustedPartners);
-    });
     return (
         <section className='admin-page page'>
             <header>

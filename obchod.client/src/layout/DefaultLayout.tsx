@@ -1,29 +1,25 @@
 import {
     AppShell,
-    Burger,
-    Group,
     UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from "react-router-dom";
 import classes from '../style/MobileNavbar.module.css';
 import { WebsiteHeader } from "./WebsiteHeader";
 
 
 export default function DefaultLayout() {
-    const [opened, { toggle }] = useDisclosure();
 
     const buttons = [
         <UnstyledButton mx={"xs"} className={classes.control}>Home</UnstyledButton>,
         <UnstyledButton mx={"xs"} className={classes.control}>Blog</UnstyledButton>,
         <UnstyledButton mx={"xs"} className={classes.control}>Contacts</UnstyledButton>,
-        <UnstyledButton mx={"xs"}  className={classes.control}>Support</UnstyledButton>,
+        <UnstyledButton mx={"xs"} className={classes.control}>Support</UnstyledButton>,
     ]
 
     return (
         <AppShell
             header={{ height: 60 }}
-            navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
+            navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true } }}
             padding="md"
         >
             <AppShell.Header>
