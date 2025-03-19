@@ -14,7 +14,7 @@ const queryClient = new QueryClient();
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <MantineProvider theme={theme}>
+            <MantineProvider theme={theme} defaultColorScheme="dark">
                 <Notifications position={"top-center"} zIndex={2077} />
                 <Router />
             </MantineProvider>

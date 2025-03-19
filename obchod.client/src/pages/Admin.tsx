@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuerySuccess } from '../lib/useQuerySuccess';
+import { useQuerySuccess } from '../lib/api/useQuerySuccess';
 
 function Admin() {
 

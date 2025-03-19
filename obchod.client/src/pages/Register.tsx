@@ -1,7 +1,7 @@
 import { Button, Container, Group,Paper,TextInput,PasswordInput, Title ,Text   } from '@mantine/core';
 import { registrationForm } from '../lib/form/registrationForm';
 import { useForm } from '@mantine/form';
-import { useAxiosClient } from '../lib/axios-client';
+import { useAxiosClient } from '../lib/api/axios-client';
 
 function Register() {
     document.title = "Register";
