@@ -39,6 +39,7 @@ export default function ProductcEditor() {
     const form = useForm(productForm);
 
     useQuerySuccess(prodcutResult, async (data) => {
+        console.log(data)
         setProducts(data);
     })
 

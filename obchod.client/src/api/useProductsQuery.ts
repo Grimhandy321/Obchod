@@ -13,7 +13,7 @@ export const useProductsQuery = () =>
         queryKey: ['/api/Product'],
         enabled: true,
         queryFn: async (): Promise<Product[]> => {
-            const { data } = client.get<Product[]>("/api/Product");
+            const { data } = await client.get<Product[]>("/api/Product");
             return data;
         }
     });
