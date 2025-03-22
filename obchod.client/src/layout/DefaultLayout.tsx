@@ -10,10 +10,10 @@ import { WebsiteHeader } from "./WebsiteHeader";
 export default function DefaultLayout() {
 
     const buttons = [
-        <UnstyledButton mx={"xs"} className={classes.control}>Home</UnstyledButton>,
-        <UnstyledButton mx={"xs"} className={classes.control}>Blog</UnstyledButton>,
-        <UnstyledButton mx={"xs"} className={classes.control}>Contacts</UnstyledButton>,
-        <UnstyledButton mx={"xs"} className={classes.control}>Support</UnstyledButton>,
+        <UnstyledButton key={1} mx = { "xs"} className = { classes.control } > Home</UnstyledButton >,
+        <UnstyledButton key={2} mx = { "xs"} className = { classes.control } > Blog</UnstyledButton >,
+        <UnstyledButton key={3} mx = { "xs"} className = { classes.control } > Contacts</UnstyledButton >,
+        <UnstyledButton key={4} mx={"xs"} className={classes.control}>Support</UnstyledButton>,
     ]
 
     return (
