@@ -9,6 +9,7 @@ namespace Obchod.Server.Models
         public string Name { get; set; }
         public string Brand { get; set; }
         public string Description { get; set; }
-        public string ImageURL { get; set; }
+        public List<string> ImagePaths { get; set; } = new();
+        public float Rating { get; set; } 
     }
 }

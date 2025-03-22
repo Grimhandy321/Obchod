@@ -14,8 +14,7 @@ namespace Obchod.Server
             var builder = WebApplication.CreateBuilder(args);
 
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-
+            builder.Services.AddScoped<IProductService, ProductService>();
             // Add services to the container.
             builder.Services.AddCors(options =>
             {

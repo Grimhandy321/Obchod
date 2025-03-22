@@ -21,7 +21,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, description, pr
                 borderRadius: '8px',         // Rounded corners
                 transition: 'transform 0.2s ease', // Smooth transition for hover effect
             }}
-            hoverable
         >
             <Card.Section>
                 {/* Product Image */}
@@ -33,22 +32,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, description, pr
                 />
             </Card.Section>
 
-            <Text weight={500} size="lg" style={{ marginTop: 10 }}>
+            <Text size="lg" style={{ marginTop: 10 }}>
                 {title}
             </Text>
 
-            <Text size="sm" color="dimmed" style={{ marginTop: 5 }}>
+            <Text h={"3em"} color="dimmed" lineClamp={2} style={{ marginTop: 5 }}>
                 {description}
             </Text>
 
-            <Text weight={700} size="lg" style={{ marginTop: 10 }}>
+            <Text size="lg" style={{ marginTop: 10 }}>
                 ${price}
             </Text>
 
             {/* Product Rating */}
             <Rating value={rating} readOnly style={{ marginTop: 5 }} />
 
-            <Group position="center" style={{ marginTop: 15 }}>
+            <Group  style={{ marginTop: 15 }}>
                 <Button>Add to Cart</Button>
             </Group>
         </Card>

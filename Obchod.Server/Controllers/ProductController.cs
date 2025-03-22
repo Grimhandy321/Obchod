@@ -1,79 +1,118 @@
-
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Obchod.Server.Models;
 
-
-
-namespace Obchod.Server.Controllers
+namespace Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("_myAllowSpecificOrigins")]
-
     public class ProductController : ControllerBase
     {
         private readonly MyDbContext _dbContext;
+        private readonly IWebHostEnvironment _environment;
 
-        public ProductController(MyDbContext dbContext)
+        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment)
         {
             _dbContext = dbContext;
+            _environment = environment;
         }
-
         [HttpGet]
         public IActionResult Get()
         {
-            IEnumerable<Product> products = _dbContext.products.ToList();
+            var products = _dbContext.products.ToList();
             return Ok(products);
         }
 
-        [HttpGet("{productId}")]
+        [HttpGet("{productId:int}")]
         public IActionResult Get(int productId)
         {
-            var product = _dbContext.products.FirstOrDefault(x => x.ProductID == productId);
+            var product = _dbContext.products.Find(productId);
             if (product == null)
-            {
-                return NotFound();
-            }
+                return NotFound(new { message = "Product not found" });
+
             return Ok(product);
         }
-
         [HttpPost]
-        public IActionResult Post(Product product)
+        public async Task<IActionResult> Post([FromForm] Product product, [FromForm] IFormFile[] images)
         {
-            _dbContext.products.Add(product);
-            _dbContext.SaveChanges();
-            return Ok();
+            try
+            {
+                if (images != null && images.Any())
+                {
+                    product.ImagePaths = await SaveImagesAsync(images);
+                }
+
+                _dbContext.products.Add(product);
+                await _dbContext.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(Get), new { productId = product.ProductID }, product);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error while saving product", error = ex.Message });
+            }
         }
 
-        [HttpPut("{productId}")]
-        public IActionResult Put(string productId, [FromBody] Product updatedProduct)
+        [HttpPut("{productId:int}")]
+        public async Task<IActionResult> Put(int productId, [FromForm] Product updatedProduct, [FromForm] IFormFile[] images)
         {
-            var product = _dbContext.products.Find(productId);
+            var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
+                return NotFound(new { message = "Product not found" });
+
+            // Update basic properties
+            product.Name = updatedProduct.Name;
+            product.Brand = updatedProduct.Brand;
+            product.Description = updatedProduct.Description;
+            product.Rating = updatedProduct.Rating;
+
+            // Handle image updates
+            if (images != null && images.Any())
             {
-                return NotFound();
+                product.ImagePaths.AddRange(await SaveImagesAsync(images));
             }
 
-            _dbContext.products.Remove(product);
-            _dbContext.SaveChanges();
+            _dbContext.Entry(product).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
 
-            return Ok();
+            return Ok(product);
+        }
+        [HttpDelete("{productId:int}")]
+        public async Task<IActionResult> Delete(int productId)
+        {
+            var product = await _dbContext.products.FindAsync(productId);
+            if (product == null)
+                return NotFound(new { message = "Product not found" });
+
+            _dbContext.products.Remove(product);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Product deleted successfully" });
         }
 
-        [HttpDelete("{productId}")]
-        public IActionResult Delete(string productId)
+        private async Task<List<string>> SaveImagesAsync(IFormFile[] images)
         {
-            var product = _dbContext.products.Find(productId);
-            if (product == null)
+            var imagePaths = new List<string>();
+            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
+
+            Directory.CreateDirectory(uploadFolder);
+
+            foreach (var image in images)
             {
-                return NotFound();
+                if (image.Length == 0) continue;
+
+                var uniqueFileName = $"{Guid.NewGuid()}_{image.FileName}";
+                var filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await image.CopyToAsync(stream);
+
+                imagePaths.Add($"/uploads/{uniqueFileName}");
             }
 
-            _dbContext.products.Remove(product);
-            _dbContext.SaveChanges();
-
-            return Ok();
+            return imagePaths;
         }
     }
 }
