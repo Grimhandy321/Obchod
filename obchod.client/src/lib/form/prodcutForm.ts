@@ -1,11 +1,4 @@
-export interface Product {
-    productID: number;
-    name: string;
-    brand: string;
-    description: string;
-    imagePaths: string[];
-    rating: number;
-}
+
 
 export const productForm =
 {

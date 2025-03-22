@@ -2,7 +2,7 @@ import { notifications } from '@mantine/notifications';
 import classes from './notifications.module.css';
 
 interface NotificationProps {
-    message?: string;
+    message: string | null;
     title: string;
 }
 

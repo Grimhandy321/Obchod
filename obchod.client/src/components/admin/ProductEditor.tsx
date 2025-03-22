@@ -16,6 +16,8 @@ import {
 import { useForm } from "@mantine/form";
 import axios from "axios";
 import { productForm } from "../../lib/form/prodcutForm";
+import { useProductsQuery } from "../../api/useProductsQuery";
+import { useQuerySuccess } from "../../lib/api/useQuerySuccess";
 
 interface Product {
     productID: number;
@@ -26,31 +28,20 @@ interface Product {
     rating: number;
 }
 
+const API_URL = "/api/Product";
 
 export default function ProductcEditor() {
     const [products, setProducts] = useState<Product[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [selectedProductId, setSelectedProductId] = useState<number | null>(
-        null
-    );
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+    const prodcutResult = useProductsQuery();
+    const form = useForm(productForm);
 
-    // Mantine Form Hook
-    const form = useForm(productForm)
-    // Fetch products on mount
-    useEffect(() => {
-        fetchProducts();
-    }, []);
+    useQuerySuccess(prodcutResult, async (data) => {
+        setProducts(data);
+    })
 
-    // Fetch all products
-    const fetchProducts = async () => {
-        try {
-            const response = await axios.get<Product[]>(API_URL);
-            setProducts(response.data);
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        }
-    };
 
     // Add or Update product
     const handleSubmit = async (values: Partial<Product>) => {
@@ -75,24 +66,22 @@ export default function ProductcEditor() {
                 await axios.post(API_URL, formData);
             }
 
-            fetchProducts();
+            prodcutResult.refetch();
             resetForm();
         } catch (error) {
             console.error("Error saving product:", error);
         }
     };
 
-    // Delete product
     const handleDelete = async (id: number) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
-            fetchProducts();
+            prodcutResult.refetch();
         } catch (error) {
             console.error("Error deleting product:", error);
         }
     };
 
-    // Open modal for editing a product
     const openEditModal = (product: Product) => {
         form.setValues({
             name: product.name,
@@ -106,7 +95,6 @@ export default function ProductcEditor() {
         setModalOpen(true);
     };
 
-    // Reset form and modal state
     const resetForm = () => {
         form.reset();
         setSelectedProductId(null);

@@ -10,12 +10,38 @@ import {
     Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useAxiosClient } from '../lib/api/axios-client';
 import { loginForm } from '../lib/form/loginForms';
+import { useLoginQuery } from '../api/useLoginQuery';
+import { useQueryResult } from '../lib/api/useQueryResult';
+import { showErrorNotification, showNotification } from '../components/notifications/notifications';
+import { authService } from '../lib/misc/authService';
+
 function Login() {
     document.title = "Login";
     const form = useForm(loginForm);
-    const client = useAxiosClient();
+    const loginResult = useLoginQuery({ form });
+
+    useQueryResult({
+        result: loginResult,
+        onSuccess: async (data) => {
+            if (data.status == "success")
+            {
+                showNotification({
+                    title: "Success",
+                    message: "You are logged in",
+                });
+                authService.setToken(data.token)
+            }
+            if (data.status = "error")
+            {
+                showErrorNotification({
+                    title: "Error",
+                    message: data.message,
+                })
+            }
+        }
+
+    });
 
     return (
         <Container size={600} my={40}>
@@ -59,10 +85,7 @@ function Login() {
                         console.log(form)
                         if (form.isValid())
                         {
-                            client.post('api/User/login', form.values,
-                                {
-                                    headers: { 'Content-Type': 'application/json' }
-                                });
+                            loginResult.refetch();
                         }
                     }}
                 >

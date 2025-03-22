@@ -1,10 +1,25 @@
 import axios from 'axios';
 import { showNotification, showErrorNotification } from '../../components/notifications/notifications';
+import { authService } from '../misc/authService';
 
 export const useAxiosClient = () => {
     const client = axios.create({
         baseURL: 'https://localhost:7102',
     });
+
+
+    client.interceptors.request.use(
+        (config) => {
+            const token = authService.getToken();
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    );
 
     client.interceptors.response.use(
         (response) => {
