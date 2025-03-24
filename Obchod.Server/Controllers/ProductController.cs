@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obchod.Server.Models;
+using Obchod.Server.Services;
 
 namespace Controllers
 {
@@ -12,12 +13,15 @@ namespace Controllers
     {
         private readonly MyDbContext _dbContext;
         private readonly IWebHostEnvironment _environment;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment)
+        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment, IAuthorizationService authorizationService)
         {
             _dbContext = dbContext;
             _environment = environment;
+            _authorizationService = authorizationService;
         }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -34,6 +38,7 @@ namespace Controllers
 
             return Ok(product);
         }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromForm] Product product, [FromForm] IFormFile[] images)
         {
@@ -58,6 +63,12 @@ namespace Controllers
         [HttpPut("{productId:int}")]
         public async Task<IActionResult> Put(int productId, [FromForm] Product updatedProduct, [FromForm] IFormFile[] images)
         {
+            // Admin check
+            if (!_authorizationService.IsAdmin(HttpContext))
+            {
+                return Forbid("Admin access required");
+            }
+
             var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
@@ -79,9 +90,16 @@ namespace Controllers
 
             return Ok(product);
         }
+
         [HttpDelete("{productId:int}")]
         public async Task<IActionResult> Delete(int productId)
         {
+            // Admin check
+            if (!_authorizationService.IsAdmin(HttpContext))
+            {
+                return Forbid("Admin access required");
+            }
+
             var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
