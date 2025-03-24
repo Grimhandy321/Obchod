@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Obchod.Server.Models;
+using Obchod.Server.Services;
 
 namespace Obchod.Server.Controllers
 {
@@ -13,11 +14,15 @@ namespace Obchod.Server.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly MyDbContext _dbContext;
+        private readonly JwtService _jwtService;
+        private readonly AuthorizationService _authorizationService;
 
-        public UserController(IConfiguration configuration, MyDbContext dbContext)
+        public UserController(IConfiguration configuration, MyDbContext dbContext, JwtService jwtService,AuthorizationService authorizationService)
         {
             _configuration = configuration;
             _dbContext = dbContext;
+            _jwtService = jwtService;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -56,12 +61,15 @@ namespace Obchod.Server.Controllers
                     PasswordHash = newUser.PasswordHash
                 });
                 _dbContext.SaveChanges();
-                return Ok(new {
+                return Ok(new
+                {
                     status = "success"
                 });
             }
-            else {
-                return Ok(new { 
+            else
+            {
+                return Ok(new
+                {
                     status = "error",
                     message = "User exists"
                 });
@@ -92,6 +100,11 @@ namespace Obchod.Server.Controllers
         [HttpDelete("{userId}")]
         public IActionResult Delete(int userId)
         {
+            if (!_authorizationService.IsAdmin(HttpContext))
+            {
+                return Forbid("Admin access required");
+            }
+
             var user = _dbContext.users.Find(userId);
             if (user == null)
             {
@@ -108,8 +121,9 @@ namespace Obchod.Server.Controllers
         [HttpPost("login")]
         public IActionResult Login(UserLoginRequest loginRequest)
         {
-            var user = _dbContext.users.FirstOrDefault(x =>  x.Email == loginRequest.Email);
-            if (user == null) {
+            var user = _dbContext.users.FirstOrDefault(x => x.Email == loginRequest.Email);
+            if (user == null)
+            {
                 return Ok(new
                 {
                     status = "error",
@@ -124,13 +138,12 @@ namespace Obchod.Server.Controllers
                     message = "invalid password"
                 });
             }
-            var jwtService = new JwtService(_configuration);
-            var token = jwtService.GenerateJwtToken(user);
-            return Ok(new {
+            var token = _jwtService.GenerateJwtToken(user);
+            return Ok(new
+            {
                 status = "success",
-                Token = token 
+                Token = token
             });
-            }
         }
+    }
 }
-    

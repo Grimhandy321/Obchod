@@ -22,7 +22,7 @@ export const useLoginQuery = ({ form }: useLoginQuery.props) => {
 
     return useQuery({
         queryKey: ['api/User/login'],
-        enabled: true,
+        enabled: false,
         queryFn: async (): Promise<useLoginQuery.result> => {
             const { data } = client.post('api/User/login', form.values,
                 {

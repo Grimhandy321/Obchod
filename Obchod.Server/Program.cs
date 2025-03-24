@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
+using Obchod.Server.Services;
 using System.Text;
 
 
@@ -15,6 +16,8 @@ namespace Obchod.Server
 
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
+            builder.Services.AddScoped<IJwtService, JwtService>();
             // Add services to the container.
             builder.Services.AddCors(options =>
             {

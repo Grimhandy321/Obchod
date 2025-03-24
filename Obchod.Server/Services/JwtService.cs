@@ -1,15 +1,15 @@
-﻿
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Obchod.Server
+namespace Obchod.Server.Services
 {
     public interface IJwtService
     {
         string GenerateJwtToken(User user);
+        string? GetUserIdFromToken(string token);
     }
 
     public class JwtService : IJwtService
@@ -24,7 +24,7 @@ namespace Obchod.Server
         public string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]); 
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Secret"]);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
@@ -32,7 +32,7 @@ namespace Obchod.Server
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.FirstName),
                     new Claim(ClaimTypes.Surname, user.LastName),
-                    new Claim(ClaimTypes.Email, user.Email),  
+                    new Claim(ClaimTypes.Email, user.Email),
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 NotBefore = DateTime.UtcNow,
@@ -40,6 +40,22 @@ namespace Obchod.Server
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public string? GetUserIdFromToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadJwtToken(token);
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                return userIdClaim?.Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error decoding token: {ex.Message}");
+                return null;
+            }
         }
     }
 }
