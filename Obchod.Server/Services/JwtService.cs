@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Obchod.Server.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,15 +11,18 @@ namespace Obchod.Server.Services
     {
         string GenerateJwtToken(User user);
         string? GetUserIdFromToken(string token);
+        bool IsAdmin(HttpContext httpContext);
     }
 
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private readonly MyDbContext _dbContext;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, MyDbContext dbContext)
         {
             _configuration = configuration;
+            _dbContext = dbContext;
         }
 
         public string GenerateJwtToken(User user)
@@ -56,6 +60,23 @@ namespace Obchod.Server.Services
                 Console.WriteLine($"Error decoding token: {ex.Message}");
                 return null;
             }
+        }
+        public bool IsAdmin(HttpContext httpContext)
+        {
+            var token = httpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
+            {
+                return false;
+            }
+
+            var userId = GetUserIdFromToken(token);
+            if (userId == null)
+            {
+                return false;
+            }
+
+            var user = _dbContext.users.Find(userId);
+            return user != null && user.IsAdmin;
         }
     }
 }

@@ -13,13 +13,13 @@ namespace Controllers
     {
         private readonly MyDbContext _dbContext;
         private readonly IWebHostEnvironment _environment;
-        private readonly IAuthorizationService _authorizationService;
+        private readonly JwtService _jwtService;
 
-        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment, IAuthorizationService authorizationService)
+
+        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment)
         {
             _dbContext = dbContext;
             _environment = environment;
-            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -64,7 +64,7 @@ namespace Controllers
         public async Task<IActionResult> Put(int productId, [FromForm] Product updatedProduct, [FromForm] IFormFile[] images)
         {
             // Admin check
-            if (!_authorizationService.IsAdmin(HttpContext))
+            if (!_jwtService.IsAdmin(HttpContext))
             {
                 return Forbid("Admin access required");
             }
@@ -95,7 +95,7 @@ namespace Controllers
         public async Task<IActionResult> Delete(int productId)
         {
             // Admin check
-            if (!_authorizationService.IsAdmin(HttpContext))
+            if (!_jwtService.IsAdmin(HttpContext))
             {
                 return Forbid("Admin access required");
             }

@@ -15,14 +15,12 @@ namespace Obchod.Server.Controllers
         private readonly IConfiguration _configuration;
         private readonly MyDbContext _dbContext;
         private readonly JwtService _jwtService;
-        private readonly AuthorizationService _authorizationService;
 
-        public UserController(IConfiguration configuration, MyDbContext dbContext, JwtService jwtService,AuthorizationService authorizationService)
+        public UserController(IConfiguration configuration, MyDbContext dbContext, JwtService jwtService)
         {
             _configuration = configuration;
             _dbContext = dbContext;
             _jwtService = jwtService;
-            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -100,7 +98,7 @@ namespace Obchod.Server.Controllers
         [HttpDelete("{userId}")]
         public IActionResult Delete(int userId)
         {
-            if (!_authorizationService.IsAdmin(HttpContext))
+            if (!_jwtService.IsAdmin(HttpContext))
             {
                 return Forbid("Admin access required");
             }

@@ -15,9 +15,7 @@ namespace Obchod.Server
             var builder = WebApplication.CreateBuilder(args);
 
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IAuthorizationService, AuthorizationService>();
-            builder.Services.AddScoped<IJwtService, JwtService>();
+
             // Add services to the container.
             builder.Services.AddCors(options =>
             {
@@ -31,6 +29,9 @@ namespace Obchod.Server
             });
 
             builder.Services.AddDbContext<MyDbContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
+
+
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -50,6 +51,9 @@ namespace Obchod.Server
                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey"))
                    };
                });
+
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IJwtService, JwtService>();
 
             builder.Services.AddAuthorization();
 
