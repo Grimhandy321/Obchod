@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Obchod.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("_myAllowSpecificOrigins")]
-
     public class UserController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -23,125 +26,125 @@ namespace Obchod.Server.Controllers
             _jwtService = jwtService;
         }
 
+        // Get all users
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            IEnumerable<User> users = _dbContext.users.ToList();
+            var users = await _dbContext.users.ToListAsync();
             return Ok(users);
         }
 
+        // Get user by ID
         [HttpGet("{userId}")]
-        public IActionResult Get(string userId)
+        public async Task<IActionResult> Get(string userId)
         {
-            var user = _dbContext.users.First(x => x.Id == userId);
+            var user = await _dbContext.users.FirstOrDefaultAsync(x => x.Id == userId);
             if (user == null)
             {
-                return NotFound();
+                return NotFound(new { status = "error", message = "User not found" });
             }
             return Ok(user);
         }
 
+        // Create new user
         [HttpPost]
-        public IActionResult Post(User newUser)
+        public async Task<IActionResult> Post([FromBody] User newUser)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { status = "error", message = "Invalid model state" });
             }
-            var objUser = _dbContext.users.FirstOrDefault(x => x.Email == newUser.Email);
-            if (objUser == null)
+
+            var existingUser = await _dbContext.users.FirstOrDefaultAsync(x => x.Email == newUser.Email);
+            if (existingUser != null)
             {
-                _dbContext.users.Add(new User
-                {
-                    FirstName = newUser.FirstName,
-                    LastName = newUser.LastName,
-                    Email = newUser.Email,
-                    PasswordHash = newUser.PasswordHash
-                });
-                _dbContext.SaveChanges();
-                return Ok(new
-                {
-                    status = "success"
-                });
+                return BadRequest(new { status = "error", message = "User already exists" });
             }
-            else
-            {
-                return Ok(new
-                {
-                    status = "error",
-                    message = "User exists"
-                });
-            }
+
+            // Hash the password before saving
+            newUser.PasswordHash = HashPassword(newUser.PasswordHash);
+
+            _dbContext.users.Add(newUser);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { status = "success" });
         }
 
+        // Update user
         [HttpPut("{userId}")]
-        public IActionResult Put(string userId, [FromBody] User updatedUser)
+        public async Task<IActionResult> Put(string userId, [FromBody] User updatedUser)
         {
             if (userId != updatedUser.Id)
             {
-                return BadRequest("User ID in URL does not match body");
+                return BadRequest(new { status = "error", message = "User ID in URL does not match body" });
             }
 
-            var existingUser = _dbContext.users.Find(userId);
+            var existingUser = await _dbContext.users.FindAsync(userId);
             if (existingUser == null)
             {
-                return NotFound();
+                return NotFound(new { status = "error", message = "User not found" });
             }
 
             _dbContext.Entry(existingUser).CurrentValues.SetValues(updatedUser);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { status = "success" });
         }
 
-
+        // Delete user (only for admins)
         [HttpDelete("{userId}")]
-        public IActionResult Delete(int userId)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int userId)
         {
-            if (!_jwtService.IsAdmin(HttpContext))
-            {
-                return Forbid("Admin access required");
-            }
-
-            var user = _dbContext.users.Find(userId);
+            var user = await _dbContext.users.FindAsync(userId);
             if (user == null)
             {
-                return NotFound();
+                return NotFound(new { status = "error", message = "User not found" });
             }
 
             _dbContext.users.Remove(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { status = "success" });
         }
 
-
+        // Login user and generate JWT token
         [HttpPost("login")]
-        public IActionResult Login(UserLoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
-            var user = _dbContext.users.FirstOrDefault(x => x.Email == loginRequest.Email);
+            var user = await _dbContext.users.FirstOrDefaultAsync(x => x.Email == loginRequest.Email);
             if (user == null)
             {
-                return Ok(new
-                {
-                    status = "error",
-                    message = "user not found"
-                });
+                return BadRequest(new { status = "error", message = "User not found" });
             }
-            if (user.PasswordHash != loginRequest.Password)
+
+            // Check if the password matches (consider using a hashed password for comparison)
+            if (!VerifyPassword(user.PasswordHash, loginRequest.Password))
             {
-                return Ok(new
-                {
-                    status = "error",
-                    message = "invalid password"
-                });
+                return BadRequest(new { status = "error", message = "Invalid password" });
             }
+
             var token = _jwtService.GenerateJwtToken(user);
+
             return Ok(new
             {
                 status = "success",
                 Token = token
             });
+        }
+
+        // Utility method to hash passwords
+        private string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashBytes);
+        }
+
+        private bool VerifyPassword(string storedHash, string password)
+        {
+            string passwordHash = HashPassword(password);
+            return storedHash == passwordHash;
         }
     }
 }

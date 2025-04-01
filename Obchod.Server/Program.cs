@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Obchod.Server.Middleware;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Text;
-
 
 namespace Obchod.Server
 {
@@ -16,66 +16,79 @@ namespace Obchod.Server
 
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-            // Add services to the container.
+            // Configure CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  policy =>
-                                  {
-                                      policy.AllowAnyOrigin()
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod();
-                                  });
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
             });
 
-            builder.Services.AddDbContext<MyDbContext>(e => e.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
-
-
+            // Configure Database Context
+            builder.Services.AddDbContext<MyDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DBCS")));
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Add Swagger for API documentation (development only)
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Configure JWT Authentication
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? "yourFallbackSecretKey");
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-               {
-                   options.TokenValidationParameters = new TokenValidationParameters
-                   {
-                       ValidateIssuer = true,
-                       ValidateAudience = true,
-                       ValidateLifetime = true,
-                       ValidateIssuerSigningKey = true,
-                       ValidIssuer = "yourIssuer",
-                       ValidAudience = "yourAudience",
-                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey"))
-                   };
-               });
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"],
+                        ValidAudience = jwtSettings["Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(secretKey)
+                    };
+                });
 
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IJwtService, JwtService>();
+            // Register Services
+            builder.Services.AddScoped<IJwtService, JwtService>(); // Use interface
+            builder.Services.AddScoped<ProductService>();
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            });
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Configure Middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
-            app.UseCors("_myAllowSpecificOrig   ins");
-
             app.UseHttpsRedirection();
 
+            app.UseCors(MyAllowSpecificOrigins); // Fixed typo
+
+            app.UseAuthentication(); // Authentication before Authorization
             app.UseAuthorization();
-            app.UseAuthentication();
+
+            // Add the Admin Authorization Middleware
+            app.UseMiddleware<AdminAuthorizationMiddleware>();
 
             app.MapControllers();
 
             app.Run();
+
         }
     }
 }

@@ -1,10 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
+using System.Security.Claims;
 
-namespace Controllers
+namespace Obchod.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -13,33 +15,36 @@ namespace Controllers
     {
         private readonly MyDbContext _dbContext;
         private readonly IWebHostEnvironment _environment;
-        private readonly JwtService _jwtService;
-
 
         public ProductController(MyDbContext dbContext, IWebHostEnvironment environment)
         {
             _dbContext = dbContext;
             _environment = environment;
+   
         }
 
+        //  Get all products
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var products = _dbContext.products.ToList();
+            var products = await _dbContext.products.ToListAsync();
             return Ok(products);
         }
 
+        //  Get a single product by ID
         [HttpGet("{productId:int}")]
-        public IActionResult Get(int productId)
+        public async Task<IActionResult> Get(int productId)
         {
-            var product = _dbContext.products.Find(productId);
+            var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
             return Ok(product);
         }
 
+        //  Add a new product (Admin Only)
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromForm] Product product, [FromForm] IFormFile[] images)
         {
             try
@@ -60,20 +65,16 @@ namespace Controllers
             }
         }
 
+        //  Update an existing product (Admin Only)
         [HttpPut("{productId:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Put(int productId, [FromForm] Product updatedProduct, [FromForm] IFormFile[] images)
         {
-            // Admin check
-            if (!_jwtService.IsAdmin(HttpContext))
-            {
-                return Forbid("Admin access required");
-            }
-
             var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
-            // Update basic properties
+            // Update properties
             product.Name = updatedProduct.Name;
             product.Brand = updatedProduct.Brand;
             product.Description = updatedProduct.Description;
@@ -91,15 +92,11 @@ namespace Controllers
             return Ok(product);
         }
 
+        //  Delete a product (Admin Only)
         [HttpDelete("{productId:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int productId)
         {
-            // Admin check
-            if (!_jwtService.IsAdmin(HttpContext))
-            {
-                return Forbid("Admin access required");
-            }
-
             var product = await _dbContext.products.FindAsync(productId);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
@@ -110,6 +107,7 @@ namespace Controllers
             return Ok(new { message = "Product deleted successfully" });
         }
 
+        //  Image Upload Helper
         private async Task<List<string>> SaveImagesAsync(IFormFile[] images)
         {
             var imagePaths = new List<string>();
