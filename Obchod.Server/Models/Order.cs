@@ -25,6 +25,6 @@ namespace Obchod.Server.Models
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         public OrderStatus Status { get; set; }
-        public int UserID { get; set; }
+        public string UserID { get; set; }
     }
 }

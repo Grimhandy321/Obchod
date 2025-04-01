@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Obchod.Server.Middleware;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Text;
@@ -83,7 +82,7 @@ namespace Obchod.Server
             app.UseAuthorization();
 
             // Add the Admin Authorization Middleware
-            app.UseMiddleware<AdminAuthorizationMiddleware>();
+            app.UseMiddleware<AuthorizationMiddleware>();
 
             app.MapControllers();
 

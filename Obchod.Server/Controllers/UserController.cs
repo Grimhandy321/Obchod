@@ -67,7 +67,7 @@ namespace Obchod.Server.Controllers
             _dbContext.users.Add(newUser);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new { status = "success" });
+            return Ok(new { status = "success", message = "Registration successfull" });
         }
 
         // Update user
@@ -88,7 +88,7 @@ namespace Obchod.Server.Controllers
             _dbContext.Entry(existingUser).CurrentValues.SetValues(updatedUser);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new { status = "success" });
+            return Ok(new { status = "success", message = "User update successfull" });
         }
 
         // Delete user (only for admins)
@@ -105,7 +105,7 @@ namespace Obchod.Server.Controllers
             _dbContext.users.Remove(user);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(new { status = "success" });
+            return Ok(new { status = "success", message = "User deleted" } );
         }
 
         // Login user and generate JWT token
@@ -129,6 +129,7 @@ namespace Obchod.Server.Controllers
             return Ok(new
             {
                 status = "success",
+                message = "Login successfull",
                 Token = token
             });
         }

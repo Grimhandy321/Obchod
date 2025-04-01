@@ -11,7 +11,6 @@ namespace Obchod.Server.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [EnableCors("_myAllowSpecificOrigins")]
-    [Authorize] // Requires authentication for all routes
     public class OrderController : ControllerBase
     {
         private readonly MyDbContext _dbContext;
@@ -47,7 +46,7 @@ namespace Obchod.Server.Controllers
             }
 
             var orders = _dbContext.orders
-                .Where(o => o.UserID == int.Parse(userId))
+                .Where(o => o.UserID == userId)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
                 .ToList();
@@ -57,15 +56,12 @@ namespace Obchod.Server.Controllers
 
         //  Create Order (Only for Authenticated Users)
         [HttpPost]
+        [Authorize]
         public IActionResult Post([FromBody] Order newOrder)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
-            newOrder.UserID = int.Parse(userId);
+            newOrder.UserID = userId;
+            newOrder.Status = OrderStatus.Pending;
 
             if (newOrder.OrderItems == null || !newOrder.OrderItems.Any())
             {
@@ -80,14 +76,9 @@ namespace Obchod.Server.Controllers
 
         //  Update Order (User Can Only Update Their Own Order)
         [HttpPut("{orderId}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Put(int orderId, [FromBody] Order updatedOrder)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
             var existingOrder = _dbContext.orders
                 .Include(o => o.OrderItems)
                 .FirstOrDefault(o => o.OrderID == orderId);
@@ -95,12 +86,6 @@ namespace Obchod.Server.Controllers
             if (existingOrder == null)
             {
                 return NotFound();
-            }
-
-            // Ensure user can only update their own orders
-            if (existingOrder.UserID != int.Parse(userId))
-            {
-                return Forbid();
             }
 
             _dbContext.Entry(existingOrder).CurrentValues.SetValues(updatedOrder);
@@ -117,6 +102,32 @@ namespace Obchod.Server.Controllers
             }
 
             _dbContext.SaveChanges();
+            return Ok();
+        }
+
+        // Cancel Order 
+        [HttpGet("api/Order/cancel/{orderId}")]
+        [Authorize]
+        public IActionResult Cancel(int orderId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var order = _dbContext.orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefault(o => o.OrderID == orderId);
+
+            if (order == null)
+            {
+                return NotFound(new {message = "Order not found "});
+            }
+            if (order.UserID == userId)
+            {
+                return NotFound(new { message = "Cant cancel order " });
+            }
+
+            _dbContext.orderItems.RemoveRange(order.OrderItems);
+            _dbContext.orders.Remove(order);
+            _dbContext.SaveChanges();
+
             return Ok();
         }
 
