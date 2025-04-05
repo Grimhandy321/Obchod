@@ -38,7 +38,7 @@ function Register() {
                     placeholder="Your password"
                     required
                     mt="md"
-                    {...form.getInputProps("password")}
+                    {...form.getInputProps("passwordHash")}
                 />
                 <Button
                     fullWidth mt="xl"

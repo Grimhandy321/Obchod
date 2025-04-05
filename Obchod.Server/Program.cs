@@ -57,7 +57,7 @@ namespace Obchod.Server
                 });
 
             // Register Services
-            builder.Services.AddScoped<IJwtService, JwtService>(); // Use interface
+            builder.Services.AddScoped<JwtService>(); // Use interface
             builder.Services.AddScoped<ProductService>();
 
             builder.Services.AddAuthorization(options =>

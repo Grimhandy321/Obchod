@@ -18,12 +18,14 @@ namespace Obchod.Server.Controllers
         private readonly IConfiguration _configuration;
         private readonly MyDbContext _dbContext;
         private readonly JwtService _jwtService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserController(IConfiguration configuration, MyDbContext dbContext, JwtService jwtService)
+        public UserController(IConfiguration configuration, MyDbContext dbContext, JwtService jwtService,IWebHostEnvironment webHostEnvironment)
         {
             _configuration = configuration;
             _dbContext = dbContext;
             _jwtService = jwtService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // Get all users
@@ -112,6 +114,28 @@ namespace Obchod.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
+            Response.Headers["Location"] = "/home";
+            if (_webHostEnvironment.IsDevelopment() && loginRequest.Email == "michal.jezek07@gmail.com") 
+            {
+                User devUser = new User
+                {
+                    Email = loginRequest.Email,
+                    FirstName = "Michal",
+                    LastName = "Prihoda",
+                    IsAdmin = true,
+                    Id = "0",
+
+
+                };
+                Response.Headers["Location"] = "/admin";
+                return Ok(new
+                {
+                    status = "success",
+                    message = "Dev Login successfull",
+                    Token = _jwtService.GenerateJwtToken(devUser)
+            });
+            }
+
             var user = await _dbContext.users.FirstOrDefaultAsync(x => x.Email == loginRequest.Email);
             if (user == null)
             {

@@ -15,14 +15,14 @@ export const registrationForm = {
         firstName: '',
         lastName: '',
         email: '',
-        password: '',
+        passwordHash: '',
     },
 
     validate: {
         firstName: (value : string) => (value ? null : "Can't be empty"),
         lastName: (value: string) => (value ? null : "Can't be empty"),
         email: (value: string) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-        password: validatePassword,
+        passwordHash: validatePassword,
     },
     }
 

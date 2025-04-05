@@ -14,9 +14,9 @@ namespace Obchod.Server.Controllers
     public class OrderController : ControllerBase
     {
         private readonly MyDbContext _dbContext;
-        private readonly IJwtService _jwtService;
+        private readonly JwtService _jwtService;
 
-        public OrderController(MyDbContext dbContext, IJwtService jwtService)
+        public OrderController(MyDbContext dbContext, JwtService jwtService)
         {
             _dbContext = dbContext;
             _jwtService = jwtService;

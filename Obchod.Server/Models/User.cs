@@ -20,7 +20,6 @@ namespace Obchod.Server.Models
 
         [Column(TypeName = "datetime")]
         public DateTime LastLogin { get; set; } = DateTime.Now;
-
         public bool IsAdmin { get; set; } = false;
     }
 }

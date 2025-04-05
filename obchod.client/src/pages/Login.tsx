@@ -13,34 +13,27 @@ import { useForm } from '@mantine/form';
 import { loginForm } from '../lib/form/loginForms';
 import { useLoginQuery } from '../api/useLoginQuery';
 import { useQueryResult } from '../lib/api/useQueryResult';
-import { showErrorNotification, showNotification } from '../components/notifications/notifications';
 import { authService } from '../lib/misc/authService';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     document.title = "Login";
     const form = useForm(loginForm);
-    const loginResult = useLoginQuery({ form });
+    const navigate = useNavigate();
+    const loginResult = useLoginQuery({ form});
 
     useQueryResult({
         result: loginResult,
         onSuccess: async (data) => {
-            if (data.status == "success")
-            {
-                showNotification({
-                    title: "Success",
-                    message: "You are logged in",
-                });
+            console.log(data);
+            if (data.status == "success") {
                 authService.setToken(data.token)
-            }
-            if (data.status = "error")
-            {
-                showErrorNotification({
-                    title: "Error",
-                    message: data.message,
-                })
+                if (data.location)
+                {
+                    navigate(data.location);
+                }
             }
         }
-
     });
 
     return (
@@ -82,7 +75,6 @@ function Login() {
                     mt="xl"
                     onClick={() => {
                         form.validate();
-                        console.log(form)
                         if (form.isValid())
                         {
                             loginResult.refetch();

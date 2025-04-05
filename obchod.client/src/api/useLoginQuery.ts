@@ -10,7 +10,8 @@ export namespace useLoginQuery {
     export interface result {
         token: string,
         status: Status,
-        message: string | null
+        message: string | null,
+        location: string | null,
     }
 }
 
@@ -24,7 +25,7 @@ export const useLoginQuery = ({ form }: useLoginQuery.props) => {
         queryKey: ['api/User/login'],
         enabled: false,
         queryFn: async (): Promise<useLoginQuery.result> => {
-            const { data } = client.post('api/User/login', form.values,
+            const { data } = await client.post('api/User/login', form.values,
                 {
                     headers: { 'Content-Type': 'application/json' }
                 });
