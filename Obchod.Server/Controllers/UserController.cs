@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Obchod.Server.Attributes;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Security.Cryptography;
@@ -95,7 +96,7 @@ namespace Obchod.Server.Controllers
 
         // Delete user (only for admins)
         [HttpDelete("{userId}")]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public async Task<IActionResult> Delete(int userId)
         {
             var user = await _dbContext.users.FindAsync(userId);

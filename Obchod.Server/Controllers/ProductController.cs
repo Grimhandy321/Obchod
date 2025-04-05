@@ -6,6 +6,10 @@ using Obchod.Server.Attributes;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Security.Claims;
+using System.IO;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Obchod.Server.Controllers
 {
@@ -15,12 +19,15 @@ namespace Obchod.Server.Controllers
     {
         private readonly MyDbContext _dbContext;
         private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<ProductController> _logger;
+        private readonly ProductService _productService;
 
-        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment)
+        public ProductController(MyDbContext dbContext, IWebHostEnvironment environment, ILogger<ProductController> logger, ProductService productService)
         {
             _dbContext = dbContext;
             _environment = environment;
-   
+            _logger = logger;
+            _productService = productService;
         }
 
         //  Get all products
@@ -61,6 +68,7 @@ namespace Obchod.Server.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error while saving product: " + ex.Message);
                 return StatusCode(500, new { message = "Error while saving product", error = ex.Message });
             }
         }
@@ -113,22 +121,79 @@ namespace Obchod.Server.Controllers
             var imagePaths = new List<string>();
             var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
 
+            // Ensure the upload folder exists
             Directory.CreateDirectory(uploadFolder);
 
             foreach (var image in images)
             {
                 if (image.Length == 0) continue;
 
+                // Validate image type
+                if (!image.ContentType.StartsWith("image/"))
+                {
+                    _logger.LogWarning("Non-image file uploaded: " + image.FileName);
+                    throw new InvalidOperationException("Only image files are allowed.");
+                }
+
+                // Limit file size to 5MB
+                if (image.Length > 5 * 1024 * 1024)
+                {
+                    _logger.LogWarning("File too large: " + image.FileName);
+                    throw new InvalidOperationException("File size cannot exceed 5MB.");
+                }
+
                 var uniqueFileName = $"{Guid.NewGuid()}_{image.FileName}";
                 var filePath = Path.Combine(uploadFolder, uniqueFileName);
 
-                await using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream);
+                try
+                {
+                    await using var stream = new FileStream(filePath, FileMode.Create);
+                    await image.CopyToAsync(stream);
 
-                imagePaths.Add($"/uploads/{uniqueFileName}");
+                    imagePaths.Add($"/uploads/{uniqueFileName}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Error saving image " + image.FileName + ": " + ex.Message);
+                    throw new InvalidOperationException("Error occurred while saving the image.", ex);
+                }
             }
 
             return imagePaths;
+        }
+
+
+        // Upload product images
+        [HttpPost("{productId}/images")]
+        public async Task<IActionResult> UploadProductImages(int productId, [FromForm] IFormFile[] images)
+        {
+            try
+            {
+                var product = await _productService.GetProductByIdAsync(productId);
+                if (product == null) return NotFound("Product not found");
+
+                var imagePaths = await _productService.SaveImagesAsync(images);
+                product.ImagePaths.AddRange(imagePaths);
+
+                await _productService.UpdateProductAsync(product);
+
+                return Ok(new { message = "Images uploaded successfully", imagePaths });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
+            }
+        }
+
+        // Download product image
+        [HttpGet("{productId}/image/download/{fileName}")]
+        public IActionResult DownloadProductImage(int productId, string fileName)
+        {
+            var filePath = Path.Combine(_environment.WebRootPath, "uploads", fileName);
+            if (!System.IO.File.Exists(filePath)) return NotFound();
+
+            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(fileBytes, "application/octet-stream", fileName);
         }
     }
 }

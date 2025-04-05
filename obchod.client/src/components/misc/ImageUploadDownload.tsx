@@ -7,6 +7,7 @@ import {
     Group,
     Container,
 } from "@mantine/core";
+import { useAxiosClient } from "../../lib/api/axios-client";
 
 interface UploadResponse {
     imageUrl: string;
@@ -18,10 +19,24 @@ const ImageUploadDownload: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const client = useAxiosClient();
 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
+
     // Handle Image Upload
     const handleUpload = async () => {
         if (!file) {
             setError("Please select an image to upload.");
+            return;
+        }
+
+        // Validate file size and type
+        if (file.size > MAX_FILE_SIZE) {
+            setError("File is too large. Max size is 5 MB.");
+            return;
+        }
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            setError("Invalid file type. Please upload a JPEG, PNG, or GIF.");
             return;
         }
 

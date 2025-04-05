@@ -1,195 +1,147 @@
-import { useEffect, useState } from "react";
-import {
-    Container,
-    Button,
-    TextInput,
-    Textarea,
-    NumberInput,
-    FileInput,
-    Card,
-    Image,
-    Group,
-    Grid,
-    Modal,
-    Title,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { productForm } from "../../lib/form/prodcutForm";
-import { useProductsQuery } from "../../api/useProductsQuery";
-import { useQuerySuccess } from "../../lib/api/useQuerySuccess";
+import { useState, useEffect } from "react";
+import { FileInput, Button, Image, Group, Container, Notification } from "@mantine/core";
 import { useAxiosClient } from "../../lib/api/axios-client";
 
 interface Product {
-    productID: number;
+    productId: number;
     name: string;
     brand: string;
     description: string;
-    imagePaths: string[];
     rating: number;
+    imagePaths: string[];
 }
 
-const API_URL = "/api/Product";
+const ProductEditor: React.FC<{ productId: number }> = ({ productId = 1}) => {
+    const [product, setProduct] = useState<Product | null>(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const client = useAxiosClient();
 
-export default function ProductcEditor() {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
-    const prodcutResult = useProductsQuery();
-    const form = useForm(productForm);
-    const axiosClient = useAxiosClient();
-
-    useQuerySuccess(prodcutResult, async (data) => {
-        console.log(data)
-        setProducts(data);
-    })
-
-
-    // Add or Update product
-    const handleSubmit = async (values: Partial<Product>) => {
+    const fetchProduct = async () => {
         try {
-            const formData = new FormData();
+            const response = await client.get(`/api/product/${productId}`);
+            setProduct(response.data);
+        } catch (err) {
+            console.error("Failed to fetch product:", err);
+            setError("Failed to fetch product details.");
+        }
+    };
+    // Fetch product details
+    useEffect(() => {
+        fetchProduct();
+    },[]);
 
-            Object.entries(values).forEach(([key, value]) => {
-                if (key === "imagePaths" && Array.isArray(value)) {
-                    (value as File[]).forEach((file) =>
-                        formData.append("images", file)
-                    );
-                } else if (value !== undefined) {
-                    formData.append(key, value.toString());
-                }
+    // Handle Image Upload
+    const handleUpload = async () => {
+        if (!file) {
+            setError("Please select an image to upload.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("images", file);
+
+        try {
+            await client.post(`/api/product/${productId}/images`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
-
-            if (editMode && selectedProductId) {
-                // Update product
-                await axiosClient.put(`${API_URL}/${selectedProductId}`, formData);
-            } else {
-                // Add new product
-                await axiosClient.post(API_URL, formData);
-            }
-
-            prodcutResult.refetch();
-            resetForm();
-        } catch (error) {
-            console.error("Error saving product:", error);
+            setSuccess("Image uploaded successfully!");
+            setError(null);
+            // Re-fetch product details to update image paths
+            const response = await client.get(`/api/product/${productId}`);
+            setProduct(response.data);
+        } catch (err) {
+            console.error("Upload failed", err);
+            setError("Upload failed. Try again.");
         }
     };
 
-    const handleDelete = async (id: number) => {
-        try {
-            await axiosClient.delete(`${API_URL}/${id}`);
-            prodcutResult.refetch();
-        } catch (error) {
-            console.error("Error deleting product:", error);
-        }
+    // Handle Image Download
+    const handleDownload = (imageUrl: string) => {
+        const fileName = imageUrl.split("/").pop();
+        if (!fileName) return;
+
+        client.get(`/api/product/${productId}/image/download/${fileName}`, { responseType: "blob" })
+            .then((response) => {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", fileName);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            })
+            .catch((err) => {
+                console.error("Download failed", err);
+                setError("Download failed. Try again.");
+            });
     };
 
-    const openEditModal = (product: Product) => {
-        form.setValues({
-            name: product.name,
-            brand: product.brand,
-            description: product.description,
-            rating: product.rating,
-            imagePaths: [],
-        });
-        setSelectedProductId(product.productID);
-        setEditMode(true);
-        setModalOpen(true);
-    };
-
-    const resetForm = () => {
-        form.reset();
-        setSelectedProductId(null);
-        setEditMode(false);
-        setModalOpen(false);
-    };
-
+    // Display existing product and upload new image
     return (
-        <Container>
-            <Title mb="lg">Product Management</Title>
+        <Container style={{ maxWidth: 600 }}>
+            <h1>Edit Product</h1>
 
-            {/* Add/Edit Modal */}
-            <Modal
-                opened={modalOpen}
-                onClose={resetForm}
-                title={editMode ? "Edit Product" : "Add Product"}
-            >
-                <form onSubmit={form.onSubmit(handleSubmit)}>
-                    <TextInput
-                        label="Name"
-                        {...form.getInputProps("name")}
-                        required
-                    />
-                    <TextInput
-                        label="Brand"
-                        {...form.getInputProps("brand")}
-                        required
-                    />
-                    <Textarea
-                        label="Description"
-                        {...form.getInputProps("description")}
-                        required
-                    />
-                    <NumberInput
-                        label="Rating"
-                        {...form.getInputProps("rating")}
-                        min={0}
-                        max={5}
-                        required
-                    />
+            {error && (
+                <Notification color="red" mt="md" onClose={() => setError(null)}>
+                    {error}
+                </Notification>
+            )}
+
+            {success && (
+                <Notification color="green" mt="md" onClose={() => setSuccess(null)}>
+                    {success}
+                </Notification>
+            )}
+
+            {product ? (
+                <>
+                    <div>
+                        <strong>Product Name:</strong> {product.name}
+                    </div>
+                    <div>
+                        <strong>Brand:</strong> {product.brand}
+                    </div>
+                    <div>
+                        <strong>Description:</strong> {product.description}
+                    </div>
+                    <div>
+                        <strong>Rating:</strong> {product.rating}
+                    </div>
+
+                    {/* Display existing images */}
+                    <div>
+                        <h3>Existing Images</h3>
+                        <Group spacing="sm">
+                            {product.imagePaths.map((imagePath, index) => (
+                                <div key={index}>
+                                    <Image src={imagePath} alt={`Product Image ${index + 1}`} width={100} height={100} />
+                                    <Button variant="link" onClick={() => handleDownload(imagePath)}>
+                                        Download
+                                    </Button>
+                                </div>
+                            ))}
+                        </Group>
+                    </div>
+
+                    {/* Image upload */}
                     <FileInput
-                        label="Upload Images"
-                        placeholder="Select images"
-                        multiple
-                        onChange={(files) => form.setFieldValue("imagePaths", files || [])}
+                        label="Upload New Image"
+                        placeholder="Choose a file"
+                        value={file}
+                        onChange={setFile}
+                        accept="image/*"
                     />
-
-                    <Button mt="md" type="submit">
-                        {editMode ? "Update Product" : "Add Product"}
+                    <Button onClick={handleUpload} disabled={!file} mt="md">
+                        Upload Image
                     </Button>
-                </form>
-            </Modal>
-
-            {/* Add Product Button */}
-            <Button mb="md" onClick={() => setModalOpen(true)}>
-                Add Product
-            </Button>
-
-            {/* Product List */}
-            <Grid>
-                {products.map((product) => (
-                    <Grid.Col span={4} key={product.productID}>
-                        <Card shadow="sm" padding="lg">
-                            {product.imagePaths?.[0] && (
-                                <Image
-                                    src={product.imagePaths[0]}
-                                    alt={product.name}
-                                    height={160}
-                                />
-                            )}
-                            <Title order={4}>{product.name}</Title>
-                            <p>Brand: {product.brand}</p>
-                            <p>{product.description}</p>
-                            <p>Rating: {product.rating}</p>
-
-                            <Group mt="md">
-                                <Button
-                                    color="blue"
-                                    onClick={() => openEditModal(product)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    color="red"
-                                    onClick={() => handleDelete(product.productID)}
-                                >
-                                    Delete
-                                </Button>
-                            </Group>
-                        </Card>
-                    </Grid.Col>
-                ))}
-            </Grid>
+                </>
+            ) : (
+                <div>Loading product details...</div>
+            )}
         </Container>
     );
-}
+};
+
+export default ProductEditor;

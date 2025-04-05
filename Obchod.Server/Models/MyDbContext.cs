@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Obchod.Server.Models
 {
@@ -23,7 +24,11 @@ namespace Obchod.Server.Models
                 .HasOne(oi => oi.Order)
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderID);
-
+            modelBuilder.Entity<Product>()
+                .Property(p => p.ImagePaths)
+                .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null));
         }
     }
 }

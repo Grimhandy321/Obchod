@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Obchod.Server.Attributes;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Security.Claims;
@@ -24,7 +25,7 @@ namespace Obchod.Server.Controllers
 
         //  Get All Orders (Admin Only)
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public IActionResult Get()
         {
             var orders = _dbContext.orders
@@ -37,13 +38,10 @@ namespace Obchod.Server.Controllers
 
         //  Get Orders for the Logged-in User
         [HttpGet("user")]
+        [SessionAuthorize]
         public IActionResult GetUserOrders()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             var orders = _dbContext.orders
                 .Where(o => o.UserID == userId)
@@ -56,7 +54,7 @@ namespace Obchod.Server.Controllers
 
         //  Create Order (Only for Authenticated Users)
         [HttpPost]
-        [Authorize]
+        [SessionAuthorize]
         public IActionResult Post([FromBody] Order newOrder)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -76,7 +74,7 @@ namespace Obchod.Server.Controllers
 
         //  Update Order (User Can Only Update Their Own Order)
         [HttpPut("{orderId}")]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public IActionResult Put(int orderId, [FromBody] Order updatedOrder)
         {
             var existingOrder = _dbContext.orders
@@ -106,8 +104,8 @@ namespace Obchod.Server.Controllers
         }
 
         // Cancel Order 
-        [HttpGet("api/Order/cancel/{orderId}")]
-        [Authorize]
+        [HttpGet("api/[controller]/cancel/{orderId}")]
+        [SessionAuthorize]
         public IActionResult Cancel(int orderId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -133,7 +131,7 @@ namespace Obchod.Server.Controllers
 
         //  Delete Order (Only Admins)
         [HttpDelete("{orderId}")]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public IActionResult Delete(int orderId)
         {
             var order = _dbContext.orders

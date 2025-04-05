@@ -70,12 +70,11 @@ namespace Obchod.Server
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+                        app.UseStaticFiles(); // for loading images
             app.UseCors(); 
-
             app.UseHttpsRedirection();
-
             app.UseAuthentication();  // <--- This populates context.User
+
 
             // Add the Admin Authorization Middleware
             app.UseMiddleware<AuthorizationMiddleware>();
