@@ -24,10 +24,6 @@ namespace Obchod.Server.Models
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderID);
 
-            modelBuilder.Entity<OrderItem>()
-                .HasOne(oi => oi.Product)
-                .WithMany(p => p.OrderItems)
-                .HasForeignKey(oi => oi.ProductID);
         }
     }
 }

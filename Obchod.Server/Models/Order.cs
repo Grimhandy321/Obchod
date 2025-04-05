@@ -21,7 +21,7 @@ namespace Obchod.Server.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
 
-        // Many-to-Many Relationship
+        // One-to-Many Relationship
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
         public OrderStatus Status { get; set; }

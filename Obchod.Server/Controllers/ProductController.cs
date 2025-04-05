@@ -44,7 +44,7 @@ namespace Obchod.Server.Controllers
 
         //  Add a new product (Admin Only)
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public async Task<IActionResult> Post([FromForm] Product product, [FromForm] IFormFile[] images)
         {
             try
@@ -67,7 +67,7 @@ namespace Obchod.Server.Controllers
 
         //  Update an existing product (Admin Only)
         [HttpPut("{productId:int}")]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public async Task<IActionResult> Put(int productId, [FromForm] Product updatedProduct, [FromForm] IFormFile[] images)
         {
             var product = await _dbContext.products.FindAsync(productId);
