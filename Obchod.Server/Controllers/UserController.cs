@@ -114,7 +114,6 @@ namespace Obchod.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest loginRequest)
         {
-            Response.Headers["Location"] = "/home";
             if (_webHostEnvironment.IsDevelopment() && loginRequest.Email == "michal.jezek07@gmail.com") 
             {
                 User devUser = new User
@@ -127,13 +126,13 @@ namespace Obchod.Server.Controllers
 
 
                 };
-                Response.Headers["Location"] = "/admin";
                 return Ok(new
                 {
                     status = "success",
                     message = "Dev Login successfull",
+                    location = "/admin",
                     Token = _jwtService.GenerateJwtToken(devUser)
-            });
+                });
             }
 
             var user = await _dbContext.users.FirstOrDefaultAsync(x => x.Email == loginRequest.Email);
@@ -154,6 +153,7 @@ namespace Obchod.Server.Controllers
             {
                 status = "success",
                 message = "Login successfull",
+                location = "/home",
                 Token = token
             });
         }

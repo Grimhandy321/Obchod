@@ -5,6 +5,7 @@ using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Text;
 
+
 namespace Obchod.Server
 {
     public class Program
@@ -13,18 +14,18 @@ namespace Obchod.Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+            var MyAllowSpecificOrigins = "https://localhost:5173";
 
             // Configure CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                    policy =>
-                    {
-                        policy.AllowAnyOrigin()
-                              .AllowAnyHeader()
-                              .AllowAnyMethod();
-                    });
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.WithOrigins(MyAllowSpecificOrigins)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
             });
 
             // Configure Database Context
@@ -46,8 +47,8 @@ namespace Obchod.Server
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = jwtSettings["Issuer"],
@@ -57,13 +58,9 @@ namespace Obchod.Server
                 });
 
             // Register Services
-            builder.Services.AddScoped<JwtService>(); // Use interface
+            builder.Services.AddScoped<JwtService>(); 
             builder.Services.AddScoped<ProductService>();
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-            });
 
             var app = builder.Build();
 
@@ -74,12 +71,11 @@ namespace Obchod.Server
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(); 
+
             app.UseHttpsRedirection();
 
-            app.UseCors(MyAllowSpecificOrigins); // Fixed typo
-
-            app.UseAuthentication(); // Authentication before Authorization
-            app.UseAuthorization();
+            app.UseAuthentication();  // <--- This populates context.User
 
             // Add the Admin Authorization Middleware
             app.UseMiddleware<AuthorizationMiddleware>();

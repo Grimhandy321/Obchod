@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Obchod.Server.Attributes;
 
 public class AuthorizationMiddleware
 {
@@ -14,7 +15,7 @@ public class AuthorizationMiddleware
         var endpoint = context.GetEndpoint();
         if (endpoint != null)
         {
-            var authorizeAttributes = endpoint.Metadata.GetOrderedMetadata<AuthorizeAttribute>();
+            var authorizeAttributes = endpoint.Metadata.GetOrderedMetadata<SessionAuthorizeAttribute>();
 
             // Check if any [Authorize] has the role "Admin"
             foreach (var attribute in authorizeAttributes)

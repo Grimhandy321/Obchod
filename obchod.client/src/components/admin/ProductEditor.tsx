@@ -14,10 +14,10 @@ import {
     Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import axios from "axios";
 import { productForm } from "../../lib/form/prodcutForm";
 import { useProductsQuery } from "../../api/useProductsQuery";
 import { useQuerySuccess } from "../../lib/api/useQuerySuccess";
+import { useAxiosClient } from "../../lib/api/axios-client";
 
 interface Product {
     productID: number;
@@ -37,6 +37,7 @@ export default function ProductcEditor() {
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const prodcutResult = useProductsQuery();
     const form = useForm(productForm);
+    const axiosClient = useAxiosClient();
 
     useQuerySuccess(prodcutResult, async (data) => {
         console.log(data)
@@ -61,10 +62,10 @@ export default function ProductcEditor() {
 
             if (editMode && selectedProductId) {
                 // Update product
-                await axios.put(`${API_URL}/${selectedProductId}`, formData);
+                await axiosClient.put(`${API_URL}/${selectedProductId}`, formData);
             } else {
                 // Add new product
-                await axios.post(API_URL, formData);
+                await axiosClient.post(API_URL, formData);
             }
 
             prodcutResult.refetch();
@@ -76,7 +77,7 @@ export default function ProductcEditor() {
 
     const handleDelete = async (id: number) => {
         try {
-            await axios.delete(`${API_URL}/${id}`);
+            await axiosClient.delete(`${API_URL}/${id}`);
             prodcutResult.refetch();
         } catch (error) {
             console.error("Error deleting product:", error);

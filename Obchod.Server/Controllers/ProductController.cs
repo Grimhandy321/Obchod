@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Obchod.Server.Attributes;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Security.Claims;
@@ -10,7 +11,6 @@ namespace Obchod.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("_myAllowSpecificOrigins")]
     public class ProductController : ControllerBase
     {
         private readonly MyDbContext _dbContext;
@@ -94,7 +94,7 @@ namespace Obchod.Server.Controllers
 
         //  Delete a product (Admin Only)
         [HttpDelete("{productId:int}")]
-        [Authorize(Roles = "Admin")]
+        [SessionAuthorize("Admin")]
         public async Task<IActionResult> Delete(int productId)
         {
             var product = await _dbContext.products.FindAsync(productId);

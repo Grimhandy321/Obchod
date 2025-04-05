@@ -10,7 +10,7 @@ namespace Obchod.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("_myAllowSpecificOrigins")]
+    [EnableCors]
     public class OrderController : ControllerBase
     {
         private readonly MyDbContext _dbContext;

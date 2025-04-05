@@ -23,10 +23,12 @@ export const useAxiosClient = () => {
 
     client.interceptors.response.use(
         (response) => {
-            showNotification({
-                title: 'Success',
-                message: response.data?.message || 'Request was successful!',
-            });
+            if (response.data?.message) {
+                showNotification({
+                    title: 'Success',
+                    message: response.data?.message || 'Request was successful!',
+                });
+            }
             return response;
         },
         (error) => {
