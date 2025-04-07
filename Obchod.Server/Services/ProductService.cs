@@ -26,7 +26,7 @@ public class ProductService : IProductService
         _logger = logger;
     }
 
-    private async Task<List<string>> SaveImagesAsync(IFormFile[] images)
+    public async Task<List<string>> SaveImagesAsync(IFormFile[] images)
     {
         var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
         Directory.CreateDirectory(uploadFolder);

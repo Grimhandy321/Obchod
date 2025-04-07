@@ -13,7 +13,7 @@ namespace Obchod.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("_myAllowSpecificOrigins")]
+    [EnableCors]
     public class UserController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -132,6 +132,7 @@ namespace Obchod.Server.Controllers
                     status = "success",
                     message = "Dev Login successfull",
                     location = "/admin",
+                    userData = devUser,
                     Token = _jwtService.GenerateJwtToken(devUser)
                 });
             }
@@ -155,6 +156,7 @@ namespace Obchod.Server.Controllers
                 status = "success",
                 message = "Login successfull",
                 location = "/home",
+                userData = user,
                 Token = token
             });
         }

@@ -169,13 +169,14 @@ namespace Obchod.Server.Controllers
         {
             try
             {
-                var product = await _productService.GetProductByIdAsync(productId);
+                var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
                 if (product == null) return NotFound("Product not found");
 
                 var imagePaths = await _productService.SaveImagesAsync(images);
                 product.ImagePaths.AddRange(imagePaths);
 
-                await _productService.UpdateProductAsync(product);
+                _dbContext.products.Update(product);
+                _dbContext.SaveChanges();
 
                 return Ok(new { message = "Images uploaded successfully", imagePaths });
             }

@@ -5,6 +5,7 @@ import { authService } from '../misc/authService';
 export const useAxiosClient = () => {
     const client = axios.create({
         baseURL: 'https://localhost:7102',
+        withCredentials: true,
     });
 
 
