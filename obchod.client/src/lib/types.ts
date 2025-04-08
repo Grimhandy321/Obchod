@@ -1,9 +1,9 @@
 export interface Product {
-    productID: number;
+    productId: number;
     name: string;
     brand: string;
     description: string;
-    imagePaths: string[];
     rating: number;
+    imagePaths: string[];
 }
 export type Status = 'error' | 'success';

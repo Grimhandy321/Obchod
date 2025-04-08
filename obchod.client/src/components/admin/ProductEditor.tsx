@@ -11,7 +11,7 @@ interface Product {
     imagePaths: string[];
 }
 
-const ProductEditor: React.FC<{ productId: number }> = ({ productId = 1}) => {
+const ProductEditor: React.FC<{ productId: number }> = ({ productId = 0}) => {
     const [product, setProduct] = useState<Product | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
