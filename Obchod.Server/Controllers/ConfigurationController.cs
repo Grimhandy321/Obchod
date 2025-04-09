@@ -15,7 +15,6 @@ namespace Obchod.Server.Controllers
 
 
         [HttpGet]
-        [Authorize]
         [Route("/testToken")]
         public IActionResult GetSecureData()
         {

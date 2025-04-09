@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Text;
-
 
 namespace Obchod.Server
 {
@@ -34,10 +34,6 @@ namespace Obchod.Server
 
             builder.Services.AddControllers();
 
-            // Add Swagger for API documentation (development only)
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
             // Configure JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Secret"] ?? "yourFallbackSecretKey");
@@ -58,31 +54,59 @@ namespace Obchod.Server
                 });
 
             // Register Services
-            builder.Services.AddScoped<JwtService>(); 
+            builder.Services.AddScoped<JwtService>();
             builder.Services.AddScoped<ProductService>();
 
+            // Add Swagger with JWT support
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Obchod API", Version = "v1" });
+
+                var jwtSecurityScheme = new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Description = "Enter JWT token like: Bearer {your token}",
+
+                    Reference = new OpenApiReference
+                    {
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    { jwtSecurityScheme, Array.Empty<string>() }
+                });
+            });
 
             var app = builder.Build();
 
-            // Configure Middleware
+            // Middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-                        app.UseStaticFiles(); // for loading images
-            app.UseCors(); 
+
+            app.UseStaticFiles(); // for loading images
+            app.UseCors();
             app.UseHttpsRedirection();
-            app.UseAuthentication();  // <--- This populates context.User
 
-
-            // Add the Admin Authorization Middleware
-            app.UseMiddleware<AuthorizationMiddleware>();
+            app.UseAuthentication();  // Enables JWT auth
+            app.UseMiddleware<AuthorizationMiddleware>(); // Custom authorization
+            app.UseAuthorization();  // Don't forget this!
 
             app.MapControllers();
 
             app.Run();
-
         }
     }
 }

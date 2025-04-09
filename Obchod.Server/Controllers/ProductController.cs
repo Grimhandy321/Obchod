@@ -119,7 +119,7 @@ namespace Obchod.Server.Controllers
         private async Task<List<string>> SaveImagesAsync(IFormFile[] images)
         {
             var imagePaths = new List<string>();
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
+            var uploadFolder = Path.Combine(_environment.ContentRootPath, _environment.WebRootPath, "/uploads");
 
             // Ensure the upload folder exists
             Directory.CreateDirectory(uploadFolder);
