@@ -20,6 +20,7 @@ namespace Obchod.Server.Models
 
         [Column(TypeName = "datetime")]
         public DateTime LastLogin { get; set; } = DateTime.Now;
+        public List<OrderItem> ShoppingCart{ get; set; } = new List<OrderItem>();
         public bool IsAdmin { get; set; } = false;
     }
 }
