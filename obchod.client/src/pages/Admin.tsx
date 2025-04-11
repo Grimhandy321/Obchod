@@ -2,9 +2,8 @@
 import { useProductsQuery } from "../api/useProductsQuery";
 import { useQueryResult } from "../lib/api/useQueryResult";
 import { Product } from "../lib/types";
-import { Button, Card, Container, Grid, SimpleGrid, Title, Image ,Text} from "@mantine/core";
+import { Button, Card, Grid, Title, Image, Text, Group } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
-import { ProductCard } from "../components/admin/ProductCard";
 import { useAxiosClient } from "../lib/api/axios-client";
 import { ProductForm } from "../components/admin/ProductForm";
 
@@ -22,7 +21,7 @@ function Admin() {
     })
 
 
-    const handleSubmit = async (formData: FormData, isEdit: boolean, productId?: number) => {
+    const handleSubmit = async (formData: {}, isEdit: boolean, productId?: number) => {
         if (isEdit && productId) {
             await axios.put(`/api/product/${productId}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
@@ -34,11 +33,22 @@ function Admin() {
         }
         productResult.refetch();
     };
+    const handleDelete = (productId: number) => {
+        axios.delete(`/api/product/${productId}`);
+        productResult.refetch();
+    }
+    const createProduct =() =>
+    {
+        axios.post('/api/product', {}, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    }
+
 
     return (
         <>
             <Title order={2}>Products</Title>
-            <Button my="md" onClick={() => { setSelectedProduct(null); open(); }}>
+            <Button my="md" onClick={() => { createProduct(); }}>
                 Add New Product
             </Button>
 
@@ -53,9 +63,14 @@ function Admin() {
                             <Text>{product.brand}</Text>
                             <Text size="sm" color="dimmed">{product.description}</Text>
                             <Text>⭐ {product.rating}</Text>
-                            <Button mt="sm" onClick={() => { setSelectedProduct(product); open(); }}>
-                                Edit
-                            </Button>
+                            <Group justify="space-between" gap="sm">
+                                <Button mt="sm" onClick={() => { setSelectedProduct(product); open(); }}>
+                                    Edit
+                                </Button>
+                                <Button c={"red"} mt="sm" onClick={() => {handleDelete(product.productId)}}>
+                                    Delete
+                                </Button>
+                            </Group>
                         </Card>
                     </Grid.Col>
                 ))}

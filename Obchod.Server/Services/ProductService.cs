@@ -7,18 +7,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
-public interface IProductService
-{
-    Task<Product> CreateProductAsync(Product product, IFormFile[] images);
-    Product? GetProductById(int productId);
-}
 
-public class ProductService : IProductService
+public class ProductService
 {
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<ProductService> _logger;
-    private readonly List<Product> _products = new();
 
     public ProductService(IWebHostEnvironment environment, ILogger<ProductService> logger)
     {
@@ -28,7 +23,7 @@ public class ProductService : IProductService
 
     public async Task<List<string>> SaveImagesAsync(IFormFile[] images)
     {
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
+        var uploadFolder = Path.Combine(_environment.ContentRootPath, "uploads");
         Directory.CreateDirectory(uploadFolder);
 
         var imagePaths = new List<string>();
@@ -36,7 +31,7 @@ public class ProductService : IProductService
         {
             if (image == null || image.Length == 0) continue;
 
-            var uniqueFileName = $"{Guid.NewGuid()}_{image.FileName}";
+            var uniqueFileName = $"{Guid.NewGuid()}";
             var filePath = Path.Combine(uploadFolder, uniqueFileName);
 
             try
@@ -44,7 +39,7 @@ public class ProductService : IProductService
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await image.CopyToAsync(stream);
 
-                imagePaths.Add($"/uploads/{uniqueFileName}");
+                imagePaths.Add($"{uniqueFileName}");
             }
             catch (Exception ex)
             {
@@ -54,18 +49,29 @@ public class ProductService : IProductService
         }
         return imagePaths;
     }
-
-    public async Task<Product> CreateProductAsync(Product product, IFormFile[] images)
+    public async Task<bool> DeleteImageAsync(string fileName)
     {
-        var imagePaths = await SaveImagesAsync(images);
-        product.ImagePaths = imagePaths;
-        _products.Add(product);
+        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
+        var filePath = Path.Combine(uploadFolder, fileName);
 
-        return product;
-    }
+        if (!File.Exists(filePath))
+        {
+            _logger.LogWarning("Attempted to delete non-existing file: {FileName}", fileName);
+            return false;
+        }
 
-    public Product? GetProductById(int productId)
-    {
-        return _products.FirstOrDefault(p => p.ProductID == productId);
+        try
+        {
+            await Task.Run(() => File.Delete(filePath));
+            _logger.LogInformation("Deleted image: {FileName}", fileName);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete image: {FileName}", fileName);
+            return false;
+        }
     }
 }
+
+

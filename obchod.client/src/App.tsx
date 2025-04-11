@@ -7,6 +7,7 @@ import {
 import { Router } from './Router';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css'
+import '@mantine/dropzone/styles.css';
 import type { MantineThemeOverride } from "@mantine/core";
 
 const queryClient = new QueryClient();

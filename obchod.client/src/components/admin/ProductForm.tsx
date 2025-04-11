@@ -1,32 +1,23 @@
 import { useForm } from '@mantine/form';
-import { Button, FileInput, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Button,Image, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
 import { useEffect } from 'react';
-
-interface Product {
-    productId?: number;
-    name: string;
-    brand: string;
-    description: string;
-    rating: number;
-    imagePaths: string[];
-}
-
+import { Product } from '../../lib/types';
 interface ProductFormProps {
     initial?: Product;
-    onSubmit: (formData: FormData, isEdit: boolean, productId?: number) => void;
+    onSubmit: (formData: {}, isEdit: boolean, productId?: number) => void;
     opened: boolean;
     close: () => void;
 }
 
 export function ProductForm({ initial, onSubmit, opened, close }: ProductFormProps) {
+    console.log(initial)
     const form = useForm({
         initialValues: {
             name: '',
             brand: '',
             description: '',
             rating: 0,
-            images: [] as File[],
+            imagePaths: [] as string []
         },
     });
 
@@ -37,25 +28,15 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
                 brand: initial.brand,
                 description: initial.description,
                 rating: initial.rating,
-                images: [],
+                imagePaths: initial.imagePaths,
             });
         } else {
             form.reset();
         }
-    }, [initial]);
+    },[]);
 
     const handleSubmit = (values: typeof form.values) => {
-        const formData = new FormData();
-        formData.append('Name', values.name);
-        formData.append('Brand', values.brand);
-        formData.append('Description', values.description);
-        formData.append('Rating', values.rating.toString());
-
-        for (const file of values.images) {
-            formData.append('images', file);
-        }
-
-        onSubmit(formData, !!initial, initial?.productId);
+        onSubmit(form.values , !!initial, initial?.productId);
         close();
     };
 
@@ -66,7 +47,7 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
                 <TextInput label="Brand" {...form.getInputProps('brand')} required />
                 <Textarea label="Description" {...form.getInputProps('description')} required />
                 <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')} required />
-                <FileInput label="Images" multiple {...form.getInputProps('images')} accept="image/*" />
+                {form.values.imagePaths.map((path, index) => (<Image key={index} src={path}/>) )}
                 <Button mt="md" type="submit" fullWidth>
                     {initial ? 'Update' : 'Create'}
                 </Button>

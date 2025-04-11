@@ -185,6 +185,34 @@ namespace Obchod.Server.Controllers
                 return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
             }
         }
+        // Upload product images
+        [HttpDelete("{productId}/images/{fileName}")]
+        public async Task<IActionResult> DeleteProductImages(int productId, string fileName)
+        {
+            try
+            {
+                var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
+                if (product == null) return NotFound("Product not found");
+
+                var imagePaths = await _productService.DeleteImageAsync(fileName);
+                if (imagePaths)
+                {
+                    product.ImagePaths.Remove(fileName);
+                    _dbContext.products.Update(product);
+                    _dbContext.SaveChanges();
+                    return Ok(new { message = "Images uploaded successfully", imagePaths });
+                }
+                else 
+                {
+                    return StatusCode(500, new { message = "Error deleting images"});
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error deleting images", error = ex.Message });
+            }
+        }
+
 
         // Download product image
         [HttpGet("{productId}/image/download/{fileName}")]
