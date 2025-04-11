@@ -51,7 +51,7 @@ public class ProductService
     }
     public async Task<bool> DeleteImageAsync(string fileName)
     {
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads");
+        var uploadFolder = Path.Combine(_environment.ContentRootPath, "uploads");
         var filePath = Path.Combine(uploadFolder, fileName);
 
         if (!File.Exists(filePath))

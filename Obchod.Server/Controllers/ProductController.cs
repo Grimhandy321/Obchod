@@ -58,7 +58,7 @@ namespace Obchod.Server.Controllers
             {
                 if (images != null && images.Any())
                 {
-                    product.ImagePaths = await SaveImagesAsync(images);
+                    product.ImagePaths = await _productService.SaveImagesAsync(images);
                 }
 
                 _dbContext.products.Add(product);
@@ -91,7 +91,7 @@ namespace Obchod.Server.Controllers
             // Handle image updates
             if (images != null && images.Any())
             {
-                product.ImagePaths.AddRange(await SaveImagesAsync(images));
+                product.ImagePaths.AddRange(await _productService.SaveImagesAsync(images));
             }
 
             _dbContext.Entry(product).State = EntityState.Modified;
@@ -114,55 +114,6 @@ namespace Obchod.Server.Controllers
 
             return Ok(new { message = "Product deleted successfully" });
         }
-
-        //  Image Upload Helper
-        private async Task<List<string>> SaveImagesAsync(IFormFile[] images)
-        {
-            var imagePaths = new List<string>();
-            var uploadFolder = Path.Combine(_environment.ContentRootPath, "uploads");
-
-            // Ensure the upload folder exists
-            Directory.CreateDirectory(uploadFolder);
-
-            foreach (var image in images)
-            {
-                if (image.Length == 0) continue;
-
-                // Validate image type
-                if (!image.ContentType.StartsWith("image/"))
-                {
-                    _logger.LogWarning("Non-image file uploaded: " + image.FileName);
-                    throw new InvalidOperationException("Only image files are allowed.");
-                }
-
-                // Limit file size to 5MB
-                if (image.Length > 5 * 1024 * 1024)
-                {
-                    _logger.LogWarning("File too large: " + image.FileName);
-                    throw new InvalidOperationException("File size cannot exceed 5MB.");
-                }
-
-                var uniqueFileName = $"{Guid.NewGuid()}_{image.FileName}";
-                var filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-                try
-                {
-                    await using var stream = new FileStream(filePath, FileMode.Create);
-                    await image.CopyToAsync(stream);
-
-                    imagePaths.Add($"/uploads/{uniqueFileName}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Error saving image " + image.FileName + ": " + ex.Message);
-                    throw new InvalidOperationException("Error occurred while saving the image.", ex);
-                }
-            }
-
-            return imagePaths;
-        }
-
-
         // Upload product images
         [HttpPost("{productId}/images")]
         public async Task<IActionResult> UploadProductImages(int productId, [FromForm] IFormFile[] images)
@@ -170,7 +121,7 @@ namespace Obchod.Server.Controllers
             try
             {
                 var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
-                if (product == null) return NotFound("Product not found");
+                if (product == null) NotFound(new { message = "Product not found" });
 
                 var imagePaths = await _productService.SaveImagesAsync(images);
                 product.ImagePaths.AddRange(imagePaths);
@@ -185,14 +136,14 @@ namespace Obchod.Server.Controllers
                 return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
             }
         }
-        // Upload product images
+        // Delete product image
         [HttpDelete("{productId}/images/{fileName}")]
         public async Task<IActionResult> DeleteProductImages(int productId, string fileName)
         {
             try
             {
                 var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
-                if (product == null) return NotFound("Product not found");
+                if (product == null) return NotFound(new { message = "Product not found" }); ;
 
                 var imagePaths = await _productService.DeleteImageAsync(fileName);
                 if (imagePaths)
@@ -213,6 +164,22 @@ namespace Obchod.Server.Controllers
             }
         }
 
+        // Get product images
+        [HttpGet("{productId}/images")]
+        public async Task<IActionResult> GetProductImages(int productId)
+        {
+            try
+            {
+                var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
+                if (product == null) return NotFound(new { message = "Product not found" });
+
+                return Ok(new { product.ImagePaths});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
+            }
+        }
 
         // Download product image
         [HttpGet("{productId}/image/download/{fileName}")]

@@ -2,15 +2,15 @@ import { useForm } from '@mantine/form';
 import { Button,Image, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
 import { useEffect } from 'react';
 import { Product } from '../../lib/types';
+import ImageDropzone from '../misc/ImageDropzone';
 interface ProductFormProps {
-    initial?: Product;
+    initial: Product;
     onSubmit: (formData: {}, isEdit: boolean, productId?: number) => void;
     opened: boolean;
     close: () => void;
 }
 
 export function ProductForm({ initial, onSubmit, opened, close }: ProductFormProps) {
-    console.log(initial)
     const form = useForm({
         initialValues: {
             name: '',
@@ -47,7 +47,7 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
                 <TextInput label="Brand" {...form.getInputProps('brand')} required />
                 <Textarea label="Description" {...form.getInputProps('description')} required />
                 <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')} required />
-                {form.values.imagePaths.map((path, index) => (<Image key={index} src={path}/>) )}
+                <ImageDropzone product={initial} />
                 <Button mt="md" type="submit" fullWidth>
                     {initial ? 'Update' : 'Create'}
                 </Button>

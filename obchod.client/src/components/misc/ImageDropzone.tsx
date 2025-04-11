@@ -1,19 +1,25 @@
 import { Text,Image, SimpleGrid } from '@mantine/core';
-import { Dropzone,  FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { Product } from '../../lib/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useAxiosClient } from '../../lib/api/axios-client';
 
-export default function ImageDropzone(product: Product) {
-    const [files, setFiles] = useState<FileWithPath[]>([]);
+export default function ImageDropzone({ product }: {product:Product }) {
+    const [paths, setPaths] = useState<string[]>([]);
+    const axios = useAxiosClient();
 
-    const previews = files.map((file, index) => {
-        const imageUrl = URL.createObjectURL(file);
-        return <Image key={index} src={imageUrl} onLoad={() => URL.revokeObjectURL(imageUrl)} />;
+    useEffect(() => {
+       setPaths(product.imagePaths)
+    }, [])
+
+
+    const previews = paths.map((path, index) => {
+        return <Image key={index} src={path} alt={"error"} />;
     });
 
     return (
         <div>
-            <Dropzone accept={IMAGE_MIME_TYPE} onDrop={setFiles}>
+            <Dropzone accept={IMAGE_MIME_TYPE} onDrop={() => { } }>
                 <Text ta="center">Drop images here</Text>
             </Dropzone>
 

@@ -67,7 +67,7 @@ function Admin() {
                                 <Button mt="sm" onClick={() => { setSelectedProduct(product); open(); }}>
                                     Edit
                                 </Button>
-                                <Button c={"red"} mt="sm" onClick={() => {handleDelete(product.productId)}}>
+                                <Button bg={"red"} mt="sm" onClick={() => {handleDelete(product.productId)}}>
                                     Delete
                                 </Button>
                             </Group>
@@ -79,7 +79,7 @@ function Admin() {
             <ProductForm
                 opened={opened}
                 close={close}
-                initial={selectedProduct ?? undefined}
+                initial={selectedProduct ?? {}}
                 onSubmit={handleSubmit}
             />
         </>
