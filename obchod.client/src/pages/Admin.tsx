@@ -79,7 +79,7 @@ function Admin() {
             <ProductForm
                 opened={opened}
                 close={close}
-                initial={selectedProduct ?? {}}
+                initial={selectedProduct ?? null}
                 onSubmit={handleSubmit}
             />
         </>

@@ -4,7 +4,7 @@ import { authService } from '../misc/authService';
 
 export const useAxiosClient = () => {
     const client = axios.create({
-        baseURL: 'https://localhost:7102',
+        baseURL: import.meta.env.VITE_API_BASE_URL,
         withCredentials: true,
     });
 

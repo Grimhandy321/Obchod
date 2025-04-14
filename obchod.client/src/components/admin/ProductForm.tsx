@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Product } from '../../lib/types';
 import ImageDropzone from '../misc/ImageDropzone';
 interface ProductFormProps {
-    initial: Product;
+    initial: Product | null;
     onSubmit: (formData: {}, isEdit: boolean, productId?: number) => void;
     opened: boolean;
     close: () => void;
@@ -24,8 +24,8 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
     useEffect(() => {
         if (initial) {
             form.setValues({
-                name: initial.name,
-                brand: initial.brand,
+                name: initial?.name,
+                brand: initial?.brand,
                 description: initial.description,
                 rating: initial.rating,
                 imagePaths: initial.imagePaths,

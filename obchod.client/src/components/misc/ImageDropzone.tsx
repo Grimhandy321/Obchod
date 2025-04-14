@@ -1,31 +1,37 @@
-import { Text,Image, SimpleGrid } from '@mantine/core';
-import { Dropzone, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Text, Image, Box, SimpleGrid } from '@mantine/core';
+import { Dropzone } from '@mantine/dropzone';
 import { Product } from '../../lib/types';
 import { useEffect, useState } from 'react';
-import { useAxiosClient } from '../../lib/api/axios-client';
 
-export default function ImageDropzone({ product }: {product:Product }) {
+export default function ImageDropzone({ product }: { product: Product }) {
     const [paths, setPaths] = useState<string[]>([]);
-    const axios = useAxiosClient();
 
     useEffect(() => {
-       setPaths(product.imagePaths)
+        setPaths(product.imagePaths)
     }, [])
 
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
 
     const previews = paths.map((path, index) => {
-        return <Image key={index} src={path} alt={"error"} />;
+        return <Image key={index} src={`${API_URL}/${path}`} alt={"error"} />;
     });
 
     return (
-        <div>
-            <Dropzone accept={IMAGE_MIME_TYPE} onDrop={() => { } }>
+        <Box pt={"xs"}>
+            <Text
+                size="sm"
+                fw={600}
+                style={{
+                    marginBottom: 4,
+                    display: 'block',
+                }}>Images</Text>
+            <Dropzone accept={['image/png']} onDrop={() => { }}>
                 <Text ta="center">Drop images here</Text>
             </Dropzone>
 
-            <SimpleGrid cols={{ base: 1, sm: 4 }} mt={previews.length > 0 ? 'xl' : 0}>
+            <SimpleGrid cols={{ base: 1, sm: 4 }} mt={previews.length > 0 ? 'xs' : 0}>
                 {previews}
             </SimpleGrid>
-        </div>
+        </Box>
     );
 }

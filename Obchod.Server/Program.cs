@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Obchod.Server.Models;
 using Obchod.Server.Services;
 using System.Text;
+using Microsoft.Extensions.FileProviders; // Add this
 
 namespace Obchod.Server
 {
@@ -96,13 +97,26 @@ namespace Obchod.Server
                 app.UseSwaggerUI();
             }
 
-            app.UseStaticFiles(); // for loading images
+            // Serve default wwwroot (if any)
+            app.UseStaticFiles();
+
+            // Serve static files from /uploads at root path
+            var uploadPath = Path.Combine(builder.Environment.ContentRootPath, "uploads");
+            if (!Directory.Exists(uploadPath))
+                Directory.CreateDirectory(uploadPath);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(uploadPath),
+                RequestPath = "" // Serve files directly from root path
+            });
+
             app.UseCors();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();  // Enables JWT auth
             app.UseMiddleware<AuthorizationMiddleware>(); // Custom authorization
-            app.UseAuthorization();  // Don't forget this!
+            app.UseAuthorization();
 
             app.MapControllers();
 

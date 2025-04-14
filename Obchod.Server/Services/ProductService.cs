@@ -31,7 +31,7 @@ public class ProductService
         {
             if (image == null || image.Length == 0) continue;
 
-            var uniqueFileName = $"{Guid.NewGuid()}";
+            var uniqueFileName = $"{Guid.NewGuid()}.jpg";
             var filePath = Path.Combine(uploadFolder, uniqueFileName);
 
             try
