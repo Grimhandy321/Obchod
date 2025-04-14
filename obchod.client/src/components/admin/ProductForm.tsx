@@ -1,5 +1,5 @@
 import { useForm } from '@mantine/form';
-import { Button,Image, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
+import { Button, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
 import { useEffect } from 'react';
 import { Product } from '../../lib/types';
 import ImageDropzone from '../misc/ImageDropzone';
@@ -17,7 +17,7 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
             brand: '',
             description: '',
             rating: 0,
-            imagePaths: [] as string []
+            imagePaths: [] as string[]
         },
     });
 
@@ -33,14 +33,14 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
         } else {
             form.reset();
         }
-    },[]);
-
+    }, []);
     const handleSubmit = (values: typeof form.values) => {
-        onSubmit(form.values , !!initial, initial?.productId);
+        onSubmit(form.values, !!initial, initial?.productID);
         close();
     };
 
     return (
+
         <Modal opened={opened} onClose={close} title={initial ? 'Edit Product' : 'Add Product'}>
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <TextInput label="Name" {...form.getInputProps('name')} required />
@@ -53,5 +53,6 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
                 </Button>
             </form>
         </Modal>
+
     );
 }

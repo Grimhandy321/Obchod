@@ -2,7 +2,7 @@
 import { useProductsQuery } from "../api/useProductsQuery";
 import { useQueryResult } from "../lib/api/useQueryResult";
 import { Product } from "../lib/types";
-import { Button, Card, Grid, Title, Image, Text, Group } from "@mantine/core";
+import { Button, Card, Grid, Title, Image, Text, Group, Box } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { useAxiosClient } from "../lib/api/axios-client";
 import { ProductForm } from "../components/admin/ProductForm";
@@ -37,8 +37,8 @@ function Admin() {
         axios.delete(`/api/product/${productId}`);
         productResult.refetch();
     }
-    const createProduct =() =>
-    {
+    const createProduct = () => {
+        console.log("asd")
         axios.post('/api/product', {}, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -46,15 +46,13 @@ function Admin() {
 
 
     return (
-        <>
-            <Title order={2}>Products</Title>
-            <Button my="md" onClick={() => { createProduct(); }}>
-                Add New Product
-            </Button>
-
+        <Box>
+            <Box>
+                <Button onClick={() => { console.log("asd") }}>Add new Product</Button>
+            </Box>
             <Grid>
                 {products.map(product => (
-                    <Grid.Col span={4} key={product.productId}>
+                    <Grid.Col key={product.productID} span={4}>
                         <Card shadow="sm" padding="lg" withBorder>
                             {product.imagePaths[0] && (
                                 <Image src={product.imagePaths[0]} height={160} alt={product.name} />
@@ -67,7 +65,7 @@ function Admin() {
                                 <Button mt="sm" onClick={() => { setSelectedProduct(product); open(); }}>
                                     Edit
                                 </Button>
-                                <Button bg={"red"} mt="sm" onClick={() => {handleDelete(product.productId)}}>
+                                <Button bg={"red"} mt="sm" onClick={() => { handleDelete(product.productID) }}>
                                     Delete
                                 </Button>
                             </Group>
@@ -79,10 +77,10 @@ function Admin() {
             <ProductForm
                 opened={opened}
                 close={close}
-                initial={selectedProduct ?? null}
+                initial={selectedProduct}
                 onSubmit={handleSubmit}
             />
-        </>
+        </Box>
     );
 }
 

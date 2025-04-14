@@ -123,13 +123,14 @@ namespace Obchod.Server.Controllers
                 var product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
                 if (product == null) NotFound(new { message = "Product not found" });
 
-                var imagePaths = await _productService.SaveImagesAsync(images);
+                List<string> imagePaths = await _productService.SaveImagesAsync(images);
                 product.ImagePaths.AddRange(imagePaths);
 
                 _dbContext.products.Update(product);
                 _dbContext.SaveChanges();
 
-                return Ok(new { message = "Images uploaded successfully", imagePaths });
+                product = await _dbContext.products.FirstOrDefaultAsync(x => x.ProductID == productId);
+                return Ok(new { message = "Images uploaded successfully", product.ImagePaths });
             }
             catch (Exception ex)
             {
