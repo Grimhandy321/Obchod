@@ -1,9 +1,8 @@
 // src/store/useObjectStore.ts
 import { create } from "zustand";
 
-type MyObject = {
-    [key: string]: any; // or define specific fields if you prefer
-};
+type MyObject = any; // or define specific fields if you prefer
+
 
 type ObjectStore = {
     data: MyObject;

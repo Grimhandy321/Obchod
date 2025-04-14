@@ -11,6 +11,7 @@ export namespace useLoginQuery {
         token: string,
         status: Status,
         message: string | null,
+        userData: any,
         location: string | null,
     }
 }

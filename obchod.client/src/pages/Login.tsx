@@ -15,19 +15,21 @@ import { useLoginQuery } from '../api/useLoginQuery';
 import { useQueryResult } from '../lib/api/useQueryResult';
 import { authService } from '../lib/misc/authService';
 import { useNavigate } from 'react-router-dom';
+import { useObjectStore } from '../lib/context/userDataStore';
 
 function Login() {
     document.title = "Login";
     const form = useForm(loginForm);
     const navigate = useNavigate();
     const loginResult = useLoginQuery({ form});
+    const { data, setData } = useObjectStore();
 
     useQueryResult({
         result: loginResult,
         onSuccess: async (data) => {
-            console.log(data);
             if (data.status == "success") {
                 authService.setToken(data.token)
+                setData(data.userData)
                 if (data.location)
                 {
                     navigate(data.location);
@@ -35,7 +37,6 @@ function Login() {
             }
         }
     });
-
     return (
         <Container size={600} my={40}>
             <Title ta="center" >

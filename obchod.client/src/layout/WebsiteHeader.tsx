@@ -1,13 +1,4 @@
 import {
-    IconBook,
-    IconChartPie3,
-    IconChevronDown,
-    IconCode,
-    IconCoin,
-    IconFingerprint,
-    IconNotification,
-} from '@tabler/icons-react';
-import {
     Box,
     Burger,
     Button,
@@ -15,15 +6,21 @@ import {
     Drawer,
     Group,
     ScrollArea,
+    Text
 } from '@mantine/core';
+import { IconShoppingCart } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import classes from '../style/HeaderMegaMenu.module.css';
 import { useNavigate } from 'react-router-dom';
+import { useObjectStore } from '../lib/context/userDataStore';
+
 
 
 export function WebsiteHeader() {
     const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
     const navigate = useNavigate();
+    const { data } = useObjectStore();
+
 
     return (
         <Box pb={120}>
@@ -40,11 +37,16 @@ export function WebsiteHeader() {
                             Contact us
                         </a>
                     </Group>
-
-                    <Group visibleFrom="sm">
-                        <Button onClick={() => { navigate("/login") }} variant="default">Log in</Button>
-                        <Button onClick={() => { navigate("/register") }} >Sign up</Button>
-                    </Group>
+                    {!data.email ?
+                        <Group visibleFrom="sm">
+                            <Button onClick={() => { navigate("/login") }} variant="default">Log in</Button>
+                            <Button onClick={() => { navigate("/register") }} >Sign up</Button>
+                        </Group> :
+                        <Group>
+                            <IconShoppingCart size={18} onClick={() => { navigate("/checkout") }} />
+                            <Text>{data.firstName + " " + data.lastName}</Text>
+                        </Group>
+                    }
 
                     <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
                 </Group>
