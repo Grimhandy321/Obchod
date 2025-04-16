@@ -1,16 +1,17 @@
 import React from 'react';
 import { Card, Image, Text, Button, Group, Rating } from '@mantine/core';
-
 // Define the prop types for the ProductCard component
 interface ProductCardProps {
     image: string;
     title: string;
     description: string;
-    price: string;
+    price: number;
     rating: number;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ image, title, description, price, rating }) => {
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
+
     return (
         <Card
             shadow="sm"
@@ -25,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ image, title, description, pr
             <Card.Section>
                 {/* Product Image */}
                 <Image
-                    src={image}
+                    src={`${API_URL}/${image}`}
                     alt={title}
                     height={200}
                     fit="contain"

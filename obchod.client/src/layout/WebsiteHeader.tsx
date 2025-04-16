@@ -13,6 +13,8 @@ import { useDisclosure } from '@mantine/hooks';
 import classes from '../style/HeaderMegaMenu.module.css';
 import { useNavigate } from 'react-router-dom';
 import { useObjectStore } from '../lib/context/userDataStore';
+import { authService } from '../lib/misc/authService'
+
 
 
 
@@ -20,7 +22,6 @@ export function WebsiteHeader() {
     const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
     const navigate = useNavigate();
     const { data } = useObjectStore();
-
 
     return (
         <Box pb={120}>
@@ -37,7 +38,7 @@ export function WebsiteHeader() {
                             Contact us
                         </a>
                     </Group>
-                    {!data.email ?
+                    {!authService.isLoggedIn() ?
                         <Group visibleFrom="sm">
                             <Button onClick={() => { navigate("/login") }} variant="default">Log in</Button>
                             <Button onClick={() => { navigate("/register") }} >Sign up</Button>
@@ -73,10 +74,16 @@ export function WebsiteHeader() {
                     </a>
 
                     <Divider my="sm" />
-                    <Group justify="center" grow pb="xl" px="md">
-                        <Button onClick={() => {navigate("/login") } } variant="default">Log in</Button>
-                        <Button onClick={() => { navigate("/register") }} >Sign up</Button>
-                    </Group>
+                    {!authService.isLoggedIn() ?
+                        <Group visibleFrom="sm">
+                            <Button onClick={() => { navigate("/login") }} variant="default">Log in</Button>
+                            <Button onClick={() => { navigate("/register") }} >Sign up</Button>
+                        </Group> :
+                        <Group>
+                            <IconShoppingCart size={18} onClick={() => { navigate("/checkout") }} />
+                            <Text>{data.firstName + " " + data.lastName}</Text>
+                        </Group>
+                    }
                 </ScrollArea>
             </Drawer>
         </Box>
