@@ -19,12 +19,7 @@ const Products = () => {
                 {products.map((product) => (
                     <Grid.Col key={product.productID} span={4}>
                         <ProductCard
-                            productID={product.productID}
-                            image={product.imagePaths[0]}
-                            title={product.name}
-                            description={product.description}
-                            price={product.price}
-                            rating={product.rating}
+                            product={product}
                         />
                     </Grid.Col>
                 ))}

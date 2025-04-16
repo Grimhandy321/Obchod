@@ -1,17 +1,13 @@
 import React from 'react';
 import { Card, Image, Text, Button, Group, Rating } from '@mantine/core';
 import { useShoppingCartStore } from '../../lib/context/useShoppingCartStore';
+import { Product } from '../../lib/types';
 // Define the prop types for the ProductCard component
 interface ProductCardProps {
-    image: string;
-    title: string;
-    description: string;
-    price: number;
-    rating: number;
-    productID: number;
+    product: Product
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({productID, image, title, description, price, rating }) => {
+const ProductCard: React.FC<ProductCardProps> = ({product}) => {
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const addItem = useShoppingCartStore((state) => state.addItem);
 
@@ -29,31 +25,31 @@ const ProductCard: React.FC<ProductCardProps> = ({productID, image, title, descr
             <Card.Section>
                 {/* Product Image */}
                 <Image
-                    src={`${API_URL}/${image}`}
-                    alt={title}
+                    src={`${API_URL}/${product.imagePaths[0]}`}
+                    alt={product.name}
                     height={200}
                     fit="contain"
                 />
             </Card.Section>
 
             <Text size="lg" style={{ marginTop: 10 }}>
-                {title}
+                {product.name}
             </Text>
 
             <Text h={"3em"} color="dimmed" lineClamp={2} style={{ marginTop: 5 }}>
-                {description}
+                {product.description}
             </Text>
 
             <Text size="lg" style={{ marginTop: 10 }}>
-                ${price}
+                ${product.price}
             </Text>
 
             {/* Product Rating */}
-            <Rating value={rating} readOnly style={{ marginTop: 5 }} />
+            <Rating value={product.rating} readOnly style={{ marginTop: 5 }} />
 
             <Group  style={{ marginTop: 15 }}>
                 <Button onClick={() => {
-                    addItem({ productID: productID,quantity:1 })
+                    addItem({ product: product,quantity:1 })
                 }}>Add to Cart</Button>
             </Group>
         </Card>

@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { CartItem } from "../types";
+import { CartItem, Product } from "../types";
 
 type ShoppingCartStore = {
     items: CartItem[];
     setItems: (newItems: CartItem[]) => void;
     addItem: (newItem: CartItem) => void;
     removeItem: (productID: number) => void;
+    updateQuantity: (productID: number, quantity: number) => void;
     clearCart: () => void;
 };
 
@@ -20,12 +21,12 @@ export const useShoppingCartStore = create<ShoppingCartStore>()(
             addItem: (newItem) => {
                 const currentItems = get().items;
                 const existingItem = currentItems.find(
-                    (item) => item.productID === newItem.productID
+                    (item) => item?.product?.productID === newItem.product.productID
                 );
 
                 if (existingItem) {
                     const updatedItems = currentItems.map((item) =>
-                        item.productID === newItem.productID
+                        item?.product?.productID === newItem.product.productID
                             ? { ...item, quantity: item.quantity + newItem.quantity }
                             : item
                     );
@@ -37,8 +38,20 @@ export const useShoppingCartStore = create<ShoppingCartStore>()(
 
             removeItem: (productID) =>
                 set((state) => ({
-                    items: state.items.filter((item) => item.productID !== productID),
+                    items: state.items.filter((item) => item.product.productID !== productID),
                 })),
+
+            updateQuantity: (productID, quantity) =>
+                set((state) => ({
+                    items: state.items
+                        .map((item) =>
+                            item.product.productID === productID
+                                ? { ...item, quantity }
+                                : item
+                        )
+                        .filter((item) => item.quantity > 0), // auto remove if 0
+                })),
+
 
             clearCart: () => set({ items: [] }),
         }),

@@ -8,7 +8,7 @@ export interface Product {
     imagePaths: string[];
 }
 export interface CartItem{
-    productID: number;
+    product: Product;
     quantity: number;
 }
 
