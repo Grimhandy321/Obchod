@@ -181,8 +181,22 @@ namespace Obchod.Server.Controllers
                 return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
             }
         }
+        [HttpPost("/images")]
+        public async Task<IActionResult> UploadProductImages(IFormFile[] images) 
+        {
+            try
+            {
+                List<string> imagePaths = await _productService.SaveImagesAsync(images);
+                return Ok(new { imagePaths });
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
+            }
+        }
 
         // Download product image
+
         [HttpGet("{productId}/image/download/{fileName}")]
         public IActionResult DownloadProductImage(int productId, string fileName)
         {

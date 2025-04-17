@@ -3,6 +3,7 @@ import { Button, Modal, NumberInput, TextInput, Textarea } from '@mantine/core';
 import { useEffect } from 'react';
 import { Product } from '../../lib/types';
 import ImageDropzone from '../misc/ImageDropzone';
+import { productForm } from '../../lib/form/productForm';
 interface ProductFormProps {
     initial: Product | null;
     onSubmit: (formData: {}, isEdit: boolean, productId?: number) => void;
@@ -11,15 +12,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ initial, onSubmit, opened, close }: ProductFormProps) {
-    const form = useForm({
-        initialValues: {
-            name: '',
-            brand: '',
-            description: '',
-            rating: 0,
-            imagePaths: [] as string[]
-        },
-    });
+    const form = useForm(productForm);
 
     useEffect(() => {
         if (initial) {
@@ -28,7 +21,7 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
                 brand: initial?.brand,
                 description: initial.description,
                 rating: initial.rating,
-                imagePaths: initial.imagePaths,
+                imagesPaths: initial.imagePaths,
             });
         } else {
             form.reset();
@@ -43,10 +36,10 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
 
         <Modal opened={opened} onClose={close} title={initial ? 'Edit Product' : 'Add Product'}>
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <TextInput label="Name" {...form.getInputProps('name')} required />
-                <TextInput label="Brand" {...form.getInputProps('brand')} required />
-                <Textarea label="Description" {...form.getInputProps('description')} required />
-                <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')} required />
+                <TextInput label="Name" {...form.getInputProps('name')} />
+                <TextInput label="Brand" {...form.getInputProps('brand')} />
+                <Textarea label="Description" {...form.getInputProps('description')} />
+                <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')}/>
                 <ImageDropzone product={initial} />
                 <Button mt="md" type="submit" fullWidth>
                     {initial ? 'Update' : 'Create'}

@@ -8,6 +8,7 @@ namespace Obchod.Server.Models
         Pending,
         Processing,
         Shipped,
+        CancellePending,
         Delivered,
         Cancelled,
     }
@@ -23,8 +24,22 @@ namespace Obchod.Server.Models
 
         // One-to-Many Relationship
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
         public OrderStatus Status { get; set; }
         public string UserID { get; set; }
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public string Street { get; set; }
+
+        [Required]
+        public string City { get; set; }
+
+        [Required]
+        public string PostalCode { get; set; }
+
+        [Required]
+        public string Country { get; set; }
     }
 }

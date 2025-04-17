@@ -1,6 +1,6 @@
 export const authService = {
-    getToken: () => localStorage.getItem("token"),
-    setToken: (token: string) => localStorage.setItem("token", token),
-    clearToken: () => localStorage.removeItem("token"),
-    isLoggedIn: () => !(localStorage.getItem("token") === null),
+    getToken: () => sessionStorage.getItem("token"),
+    setToken: (token: string) => sessionStorage.setItem("token", token),
+    clearToken: () => sessionStorage.removeItem("token"),
+    isLoggedIn: () => !(sessionStorage.getItem("token") === null),
 };

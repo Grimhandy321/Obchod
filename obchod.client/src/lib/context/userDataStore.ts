@@ -16,7 +16,7 @@ export const useObjectStore = create<ObjectStore>()(
         }),
         {
             name: "userData-store", // localStorage key
-            getStorage: () => localStorage, // optional (default is localStorage)
+            getStorage: () => sessionStorage, // optional (default is localStorage)
         }
     )
 );

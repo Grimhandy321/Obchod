@@ -63,7 +63,7 @@ namespace Obchod.Server.Controllers
 
             if (newOrder.OrderItems == null || !newOrder.OrderItems.Any())
             {
-                return BadRequest("Order must contain at least one product.");
+                return BadRequest(new { message = "Order must contain at least one product." });
             }
 
             _dbContext.orders.Add(newOrder);

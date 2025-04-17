@@ -37,8 +37,8 @@ function Admin() {
         axios.delete(`/api/product/${productId}`);
         productResult.refetch();
     }
+    const API_URL = import.meta.env.VITE_API_BASE_URL;
     const createProduct = () => {
-        console.log("asd")
         axios.post('/api/product', {}, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -47,15 +47,15 @@ function Admin() {
 
     return (
         <Box>
-            <Box>
-                <Button onClick={() => { console.log("asd") }}>Add new Product</Button>
-            </Box>
-            <Grid>
+            <Button mt="sm" onClick={() => { open(); }}>
+               Add new product
+            </Button>
+            <Grid mt={"md"}>
                 {products.map(product => (
                     <Grid.Col key={product.productID} span={4}>
                         <Card shadow="sm" padding="lg" withBorder>
                             {product.imagePaths[0] && (
-                                <Image src={product.imagePaths[0]} height={160} alt={product.name} />
+                                <Image src={`${API_URL}/${product.imagePaths[0]}`} height={160} alt={product.name} />
                             )}
                             <Title order={4}>{product.name}</Title>
                             <Text>{product.brand}</Text>

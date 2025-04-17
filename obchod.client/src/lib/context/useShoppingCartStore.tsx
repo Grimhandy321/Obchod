@@ -57,7 +57,7 @@ export const useShoppingCartStore = create<ShoppingCartStore>()(
         }),
         {
             name: "cart-store",
-            getStorage: () => localStorage,
+            getStorage: () => sessionStorage,
         }
     )
 );

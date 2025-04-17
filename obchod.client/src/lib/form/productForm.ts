@@ -4,12 +4,12 @@ export const productForm = {
         brand: '',
         description: '',
         rating: 0,
-        images: [] as File[],
+        imagesPaths: [] as string[],
     },
     validate: {
         name: (value : string) => (value.trim().length === 0 ? 'Product name is required' : null),
         brand: (value: string) => (value.trim().length === 0 ? 'Brand name is required' : null),
         description: (value: string) => (value.trim().length === 0 ? 'Description is required' : null),
-        images: (value: []) => (value.length === 0 ? 'At least one image is required' : null),
+        imagesPaths: (value: string[]) => (value?.length === 0 ? 'At least one image is required' : null),
     },
 }; 
