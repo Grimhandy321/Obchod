@@ -21,16 +21,10 @@ function Admin() {
     })
 
 
-    const handleSubmit = async (formData: {}, isEdit: boolean, productId?: number) => {
-        if (isEdit && productId) {
+    const handleSubmit = async (formData: {}, productId?: number) => {
             await axios.put(`/api/product/${productId}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-        } else {
-            await axios.post('/api/product', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
-        }
         productResult.refetch();
     };
     const handleDelete = (productId: number) => {
@@ -39,15 +33,18 @@ function Admin() {
     }
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const createProduct = () => {
-        axios.post('/api/product', {}, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+        axios.get('/api/Product/create').then((response) => {
+            const newProducts = response.data;
+            setProducts(newProducts);
+            setSelectedProduct(newProducts[newProducts.length - 1]);
+            open();
         });
     }
 
 
     return (
         <Box>
-            <Button mt="sm" onClick={() => { open(); }}>
+            <Button mt="sm" onClick={() => { createProduct() }}>
                Add new product
             </Button>
             <Grid mt={"md"}>

@@ -6,7 +6,7 @@ import ImageDropzone from '../misc/ImageDropzone';
 import { productForm } from '../../lib/form/productForm';
 interface ProductFormProps {
     initial: Product | null;
-    onSubmit: (formData: {}, isEdit: boolean, productId?: number) => void;
+    onSubmit: (formData: {}, productId?: number) => void;
     opened: boolean;
     close: () => void;
 }
@@ -28,7 +28,7 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
         }
     }, []);
     const handleSubmit = (values: typeof form.values) => {
-        onSubmit(form.values, !!initial, initial?.productID);
+        onSubmit(form.values, initial?.productID);
         close();
     };
 

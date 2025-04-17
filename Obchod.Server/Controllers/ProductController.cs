@@ -49,6 +49,23 @@ namespace Obchod.Server.Controllers
             return Ok(product);
         }
 
+
+        //  Create a new product
+     
+        [SessionAuthorize("Admin")]
+        [HttpGet("create")]
+        public async Task<IActionResult> Create()
+        {
+            _dbContext.products.Add(new Product {
+                Brand = "",
+                Name = "",
+                Description = ""
+            });
+            await _dbContext.SaveChangesAsync();
+            var products = await _dbContext.products.ToListAsync();
+            return Ok(products);
+        }
+
         //  Add a new product (Admin Only)
         [HttpPost]
         [SessionAuthorize("Admin")]
@@ -181,20 +198,6 @@ namespace Obchod.Server.Controllers
                 return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
             }
         }
-        [HttpPost("/images")]
-        public async Task<IActionResult> UploadProductImages(IFormFile[] images) 
-        {
-            try
-            {
-                List<string> imagePaths = await _productService.SaveImagesAsync(images);
-                return Ok(new { imagePaths });
-            }
-            catch (Exception ex) 
-            {
-                return StatusCode(500, new { message = "Error uploading images", error = ex.Message });
-            }
-        }
-
         // Download product image
 
         [HttpGet("{productId}/image/download/{fileName}")]
