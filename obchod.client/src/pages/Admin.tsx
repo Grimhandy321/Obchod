@@ -1,11 +1,11 @@
 ﻿import { useState } from "react";
 import { useProductsQuery } from "../api/useProductsQuery";
-import { useQueryResult } from "../lib/api/useQueryResult";
 import { Product } from "../lib/types";
 import { Button, Card, Grid, Title, Image, Text, Group, Box } from "@mantine/core";
 import { useDisclosure } from '@mantine/hooks';
 import { useAxiosClient } from "../lib/api/axios-client";
 import { ProductForm } from "../components/admin/ProductForm";
+import { useQuerySuccess } from "../lib/api/useQuerySuccess";
 
 function Admin() {
     document.title = "Admin";
@@ -14,21 +14,33 @@ function Admin() {
     const axios = useAxiosClient();
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [opened, { open, close }] = useDisclosure(false);
+    const [created, setCreated] = useState(false);
 
-    useQueryResult({
-        result: productResult,
-        onSuccess: async (data) => { setProducts(data) },
+    useQuerySuccess(productResult, async (data: any) => {
+        console.log()
+        setProducts(data)
     })
 
 
     const handleSubmit = async (formData: {}, productId?: number) => {
-            await axios.put(`/api/product/${productId}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-            });
+        await axios.put(`/api/product/${productId}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
         productResult.refetch();
     };
-    const handleDelete = (productId: number) => {
-        axios.delete(`/api/product/${productId}`);
+
+
+    const handleClose = () => {
+        if (created && selectedProduct != null) { 
+            axios.delete(`/api/product/${selectedProduct.productID}`);
+            productResult.refetch();
+        }
+        close();
+        setSelectedProduct(null)
+    };
+
+    const handleDelete = async (productId: number) => {
+        await axios.delete(`/api/product/${productId}`);
         productResult.refetch();
     }
     const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -37,6 +49,7 @@ function Admin() {
             const newProducts = response.data;
             setProducts(newProducts);
             setSelectedProduct(newProducts[newProducts.length - 1]);
+            setCreated(true);
             open();
         });
     }
@@ -45,7 +58,7 @@ function Admin() {
     return (
         <Box>
             <Button mt="sm" onClick={() => { createProduct() }}>
-               Add new product
+                Add new product
             </Button>
             <Grid mt={"md"}>
                 {products.map(product => (
@@ -73,7 +86,8 @@ function Admin() {
 
             <ProductForm
                 opened={opened}
-                close={close}
+                close={handleClose}
+                created={created}
                 initial={selectedProduct}
                 onSubmit={handleSubmit}
             />

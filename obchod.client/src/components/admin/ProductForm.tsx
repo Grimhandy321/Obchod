@@ -4,14 +4,18 @@ import { useEffect } from 'react';
 import { Product } from '../../lib/types';
 import ImageDropzone from '../misc/ImageDropzone';
 import { productForm } from '../../lib/form/productForm';
+import { error } from 'node:console';
+import { create } from 'node:domain';
+import { useAxiosClient } from '../../lib/api/axios-client';
 interface ProductFormProps {
     initial: Product | null;
     onSubmit: (formData: {}, productId?: number) => void;
     opened: boolean;
     close: () => void;
+    created: boolean;
 }
 
-export function ProductForm({ initial, onSubmit, opened, close }: ProductFormProps) {
+export function ProductForm({ initial, onSubmit, opened, close, created = false }: ProductFormProps) {
     const form = useForm(productForm);
 
     useEffect(() => {
@@ -27,24 +31,27 @@ export function ProductForm({ initial, onSubmit, opened, close }: ProductFormPro
             form.reset();
         }
     }, []);
-    const handleSubmit = (values: typeof form.values) => {
-        onSubmit(form.values, initial?.productID);
-        close();
+    const handleSubmit = () => {
+        if (form.validate().hasErrors) {
+            console.log(form.errors)
+        }
+        else {
+            onSubmit(form.values, initial?.productID);
+            close();
+        }
     };
 
     return (
 
-        <Modal opened={opened} onClose={close} title={initial ? 'Edit Product' : 'Add Product'}>
-            <form onSubmit={form.onSubmit(handleSubmit)}>
-                <TextInput label="Name" {...form.getInputProps('name')} />
-                <TextInput label="Brand" {...form.getInputProps('brand')} />
-                <Textarea label="Description" {...form.getInputProps('description')} />
-                <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')}/>
-                <ImageDropzone product={initial} />
-                <Button mt="md" type="submit" fullWidth>
-                    {initial ? 'Update' : 'Create'}
-                </Button>
-            </form>
+        <Modal size="72%" opened={opened} onClose={close} title={initial ? 'Edit Product' : 'Add Product'}>
+            <TextInput label="Name" {...form.getInputProps('name')} />
+            <TextInput label="Brand" {...form.getInputProps('brand')} />
+            <Textarea label="Description" {...form.getInputProps('description')} />
+            <NumberInput label="Rating" min={0} max={5} {...form.getInputProps('rating')} />
+            <ImageDropzone product={initial} form={form } />
+            <Button mt="md" onClick={() => handleSubmit()} fullWidth>
+                {created ? 'Create' : 'Update'}
+            </Button>
         </Modal>
 
     );

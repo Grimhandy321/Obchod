@@ -4,7 +4,7 @@ import { Product } from '../../lib/types';
 import { useEffect, useState } from 'react';
 import { useAxiosClient } from '../../lib/api/axios-client';
 
-export default function ImageDropzone({ product }: { product: Product | null}) {
+export default function ImageDropzone({ product,form }: { product: Product | null, form : any}) {
     const [paths, setPaths] = useState<string[]>([]);
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const axios = useAxiosClient();
@@ -17,10 +17,11 @@ export default function ImageDropzone({ product }: { product: Product | null}) {
     const handleDrop = async (files: File[]) => {
         for (const file of files) {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('images', file);
             axios.post(`${API_URL}/api/Product/${product?.productID}/images`, formData).then((response) =>
             {
                 setPaths(response.data.imagePaths)
+                form.setFieldValue("imagesPaths", response.data.imagePaths)
             });
         }
     };
