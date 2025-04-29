@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Obchod.Server.Models
 {
@@ -10,6 +11,7 @@ namespace Obchod.Server.Models
 
         // Foreign Keys
         public int? OrderID { get; set; }
+        [JsonIgnore]
         public Order? Order { get; set; } = null!;
 
         public int ProductID { get; set; }

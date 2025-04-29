@@ -13,3 +13,16 @@ export interface CartItem{
 }
 
 export type Status = 'error' | 'success';
+
+export interface Order {
+    orderID: number;
+    status: number;
+    orderItems: OrderItem[];
+    dateTime: string;
+}
+
+export interface OrderItem {
+    id: number;
+    product: Product;
+    quantity: number;
+}

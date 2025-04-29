@@ -7,10 +7,11 @@ import {
     Stack,
     Text,
     Title,
-    Tabs,
     Image,
     Notification,
+    TextInput,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { IconTrash, IconMinus, IconPlus } from "@tabler/icons-react";
 import { useShoppingCartStore } from "../lib/context/useShoppingCartStore";
 import { useState } from "react";
@@ -32,26 +33,54 @@ export default function Checkout() {
         0
     );
 
-    const handlePlaceOrder = async () => {
+    const form = useForm({
+        initialValues: {
+            address: "",
+            street: "",
+            city: "",
+            postalCode: "",
+            country: "",
+        },
+
+        validate: {
+            address: (value) => (value ? null : "Address is required"),
+            street: (value) => (value ? null : "Street is required"),
+            city: (value) => (value ? null : "City is required"),
+            postalCode: (value) => (value ? null : "Postal Code is required"),
+            country: (value) => (value ? null : "Country is required"),
+        },
+    });
+
+    const handlePlaceOrder = async (values: typeof form.values) => {
         setLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
-            // Create the order payload
             const orderData = {
                 orderItems: cartItems.map((item) => ({
                     ProductID: item.product.productID,
                     Quantity: item.quantity,
                 })),
+                ...values,
+                totalPrice,
             };
 
             const response = await axios.post("/api/order", orderData);
 
             setSuccess("Order placed successfully!");
             clearCart();
-        } catch (err) {
-            setError("There was an issue placing your order. Please try again.");
+            form.reset();
+        } catch (err: any) {
+            if (err.response?.status === 400 && err.response?.data?.errors) {
+                const serverErrors = err.response.data.errors;
+                Object.keys(serverErrors).forEach((field) => {
+                    form.setFieldError(field.toLowerCase(), serverErrors[field][0]);
+                });
+                setError("Please correct the highlighted fields.");
+            } else {
+                setError("There was an issue placing your order. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
@@ -73,6 +102,7 @@ export default function Checkout() {
                     {success}
                 </Notification>
             )}
+
             {cartItems.length === 0 ? (
                 <Text>Your cart is empty.</Text>
             ) : (
@@ -114,16 +144,20 @@ export default function Checkout() {
                                 <Group gap="xs">
                                     <Button
                                         size="xs"
-                                        onClick={() => updateQuantity(item.product.productID, item.quantity - 1)}
+                                        onClick={() =>
+                                            updateQuantity(item.product.productID, item.quantity - 1)
+                                        }
                                         disabled={item.quantity <= 1}
                                         variant="outline"
                                     >
                                         <IconMinus size={14} />
                                     </Button>
                                     <Text>{item.quantity}</Text>
-                                    <Button  
+                                    <Button
                                         size="xs"
-                                        onClick={() => updateQuantity(item.product.productID, item.quantity + 1)}
+                                        onClick={() =>
+                                            updateQuantity(item.product.productID, item.quantity + 1)
+                                        }
                                         variant="outline"
                                     >
                                         <IconPlus size={14} />
@@ -131,20 +165,49 @@ export default function Checkout() {
                                 </Group>
                             </Card>
                         ))}
+                    </Stack>
+
+                    <form onSubmit={form.onSubmit(handlePlaceOrder)}>
+                        <Stack>
+                            <TextInput
+                                label="Address"
+                                placeholder="123 Main St"
+                                {...form.getInputProps("address")}
+                            />
+                            <TextInput
+                                label="Street"
+                                placeholder="Main St"
+                                {...form.getInputProps("street")}
+                            />
+                            <TextInput
+                                label="City"
+                                placeholder="New York"
+                                {...form.getInputProps("city")}
+                            />
+                            <TextInput
+                                label="Postal Code"
+                                placeholder="10001"
+                                {...form.getInputProps("postalCode")}
+                            />
+                            <TextInput
+                                label="Country"
+                                placeholder="USA"
+                                {...form.getInputProps("country")}
+                            />
                         </Stack>
 
-
-                    <Group justify="space-between" mt="md">
-                        <Group>
-                            <Button onClick={handlePlaceOrder} loading={loading}>
-                                Place Order
+                        <Group justify="space-between" mt="xl">
+                            <Group>
+                                <Button type="submit" loading={loading}>
+                                    Place Order
+                                </Button>
+                                <Text>Total: ${totalPrice.toFixed(2)}</Text>
+                            </Group>
+                            <Button color="red" onClick={clearCart}>
+                                Clear Cart
                             </Button>
-                            <Text>Total: ${totalPrice.toFixed(2)}</Text>
                         </Group>
-                        <Button color="red" onClick={clearCart}>
-                            Clear Cart
-                        </Button>
-                    </Group>
+                    </form>
 
                     <Divider my="md" />
                 </>

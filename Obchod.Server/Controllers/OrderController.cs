@@ -59,6 +59,7 @@ namespace Obchod.Server.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             newOrder.UserID = userId;
+            newOrder.DateTime = DateTime.UtcNow;
             newOrder.Status = OrderStatus.Pending;
 
             if (newOrder.OrderItems == null || !newOrder.OrderItems.Any())

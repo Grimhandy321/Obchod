@@ -8,7 +8,7 @@ import {
     ScrollArea,
     Text
 } from '@mantine/core';
-import { IconShoppingCart } from '@tabler/icons-react';
+import { IconShoppingCart, IconTruckDelivery } from '@tabler/icons-react';
 import { useDisclosure } from '@mantine/hooks';
 import classes from '../style/HeaderMegaMenu.module.css';
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +45,7 @@ export function WebsiteHeader() {
                         </Group> :
                         <Group>
                             <IconShoppingCart size={18} onClick={() => { navigate("/checkout") }} />
+                            <IconTruckDelivery stroke={2} onClick={() => { navigate("/orders") }} />
                             <Text>{data.firstName + " " + data.lastName}</Text>
                         </Group>
                     }
