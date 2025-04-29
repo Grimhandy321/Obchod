@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Obchod.Server.Models;
 
@@ -11,9 +12,11 @@ using Obchod.Server.Models;
 namespace Obchod.Server.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250416142933_address")]
+    partial class address
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -85,6 +88,7 @@ namespace Obchod.Server.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserID")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderID");
@@ -100,7 +104,7 @@ namespace Obchod.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemID"));
 
-                    b.Property<int?>("OrderID")
+                    b.Property<int>("OrderID")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductID")
@@ -159,63 +163,6 @@ namespace Obchod.Server.Migrations
                     b.HasKey("ProductID");
 
                     b.ToTable("products");
-
-                    b.HasData(
-                        new
-                        {
-                            ProductID = 1,
-                            Brand = "Sony",
-                            Count = 25,
-                            Description = "Kvalitní bezdrátová sluchátka s aktivním potlačením hluku.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\"]",
-                            Name = "Bezdrátová sluchátka",
-                            Price = 2999.99m,
-                            Rating = 4.5f
-                        },
-                        new
-                        {
-                            ProductID = 2,
-                            Brand = "Dell",
-                            Count = 10,
-                            Description = "Výkonný notebook ideální na práci i hraní her.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
-                            Name = "Notebook 15\"",
-                            Price = 23999.00m,
-                            Rating = 4.7f
-                        },
-                        new
-                        {
-                            ProductID = 3,
-                            Brand = "Apple",
-                            Count = 40,
-                            Description = "Stylové chytré hodinky s měřením zdravotních funkcí.",
-                            ImagePaths = "[\"cat.png\"]",
-                            Name = "Chytré hodinky",
-                            Price = 10999.50m,
-                            Rating = 4.8f
-                        },
-                        new
-                        {
-                            ProductID = 4,
-                            Brand = "JBL",
-                            Count = 100,
-                            Description = "Kompaktní reproduktor s mohutným zvukem a odolností proti vodě.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
-                            Name = "Bluetooth reproduktor",
-                            Price = 1499.99m,
-                            Rating = 4.4f
-                        },
-                        new
-                        {
-                            ProductID = 5,
-                            Brand = "Logitech",
-                            Count = 75,
-                            Description = "Přesná herní myš s nastavitelnou citlivostí a RGB podsvícením.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\",\"cat.png\"]",
-                            Name = "Herní myš",
-                            Price = 1299.00m,
-                            Rating = 4.6f
-                        });
                 });
 
             modelBuilder.Entity("Obchod.Server.Models.User", b =>
@@ -296,7 +243,9 @@ namespace Obchod.Server.Migrations
                 {
                     b.HasOne("Obchod.Server.Models.Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderID");
+                        .HasForeignKey("OrderID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Obchod.Server.Models.Product", "Product")
                         .WithMany()

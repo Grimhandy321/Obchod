@@ -3,6 +3,7 @@ import { Card, Image, Text, Button, Group, Rating } from '@mantine/core';
 import { useShoppingCartStore } from '../../lib/context/useShoppingCartStore';
 import { Product } from '../../lib/types';
 import { IconPlus, IconMinus, IconTrash } from '@tabler/icons-react'; 
+import { stat } from 'node:fs/promises';
 
 interface ProductCardProps {
     product: Product
@@ -18,7 +19,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const existingItem = shoppingCart.find(
         (item) => item?.product?.productID === product.productID
     );
-
     return (
         <Card
             shadow="sm"

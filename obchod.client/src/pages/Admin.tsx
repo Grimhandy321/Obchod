@@ -21,7 +21,7 @@ function Admin() {
     })
 
 
-    const handleSubmit = async (formData: [], productId?: number) => {
+    const handleSubmit = async (formData: any, productId?: number) => {
         const data = new FormData();
 
         //@ts-ignore
@@ -46,7 +46,17 @@ function Admin() {
             });
         }
 
-        productResult.refetch(); 
+        productResult.refetch();
+    };
+
+
+    const handleClose = () => {
+        if (created && selectedProduct != null) {
+            axios.delete(`/api/product/${selectedProduct.productID}`);
+            productResult.refetch();
+        }
+        close();
+        setSelectedProduct(null)
     };
 
     const handleDelete = async (productId: number) => {

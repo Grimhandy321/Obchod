@@ -24,8 +24,8 @@ namespace Obchod.Server.Models
 
         // One-to-Many Relationship
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public OrderStatus Status { get; set; }
-        public string UserID { get; set; }
+        public OrderStatus Status { get; set; } 
+        public string? UserID { get; set; }
 
         [Required]
         public string Address { get; set; }

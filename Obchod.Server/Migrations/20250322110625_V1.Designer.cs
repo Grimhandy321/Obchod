@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Obchod.Server.Models;
 
@@ -11,9 +12,11 @@ using Obchod.Server.Models;
 namespace Obchod.Server.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322110625_V1")]
+    partial class V1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,37 +58,17 @@ namespace Obchod.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UserID")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("UserID")
+                        .HasColumnType("int");
 
                     b.HasKey("OrderID");
 
@@ -100,25 +83,16 @@ namespace Obchod.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemID"));
 
-                    b.Property<int?>("OrderID")
+                    b.Property<int>("OrderID")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductID")
+                    b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("OrderItemID");
-
-                    b.HasIndex("OrderID");
-
-                    b.HasIndex("ProductID");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("orderItems");
                 });
@@ -135,14 +109,11 @@ namespace Obchod.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ImagePaths")
+                    b.PrimitiveCollection<string>("ImagePaths")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -159,63 +130,31 @@ namespace Obchod.Server.Migrations
                     b.HasKey("ProductID");
 
                     b.ToTable("products");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            ProductID = 1,
-                            Brand = "Sony",
-                            Count = 25,
-                            Description = "Kvalitní bezdrátová sluchátka s aktivním potlačením hluku.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\"]",
-                            Name = "Bezdrátová sluchátka",
-                            Price = 2999.99m,
-                            Rating = 4.5f
-                        },
-                        new
-                        {
-                            ProductID = 2,
-                            Brand = "Dell",
-                            Count = 10,
-                            Description = "Výkonný notebook ideální na práci i hraní her.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
-                            Name = "Notebook 15\"",
-                            Price = 23999.00m,
-                            Rating = 4.7f
-                        },
-                        new
-                        {
-                            ProductID = 3,
-                            Brand = "Apple",
-                            Count = 40,
-                            Description = "Stylové chytré hodinky s měřením zdravotních funkcí.",
-                            ImagePaths = "[\"cat.png\"]",
-                            Name = "Chytré hodinky",
-                            Price = 10999.50m,
-                            Rating = 4.8f
-                        },
-                        new
-                        {
-                            ProductID = 4,
-                            Brand = "JBL",
-                            Count = 100,
-                            Description = "Kompaktní reproduktor s mohutným zvukem a odolností proti vodě.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
-                            Name = "Bluetooth reproduktor",
-                            Price = 1499.99m,
-                            Rating = 4.4f
-                        },
-                        new
-                        {
-                            ProductID = 5,
-                            Brand = "Logitech",
-                            Count = 75,
-                            Description = "Přesná herní myš s nastavitelnou citlivostí a RGB podsvícením.",
-                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\",\"cat.png\"]",
-                            Name = "Herní myš",
-                            Price = 1299.00m,
-                            Rating = 4.6f
-                        });
+            modelBuilder.Entity("Obchod.Server.Models.ProductSize", b =>
+                {
+                    b.Property<int>("ProductSizeID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductSizeID"));
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductSizeID");
+
+                    b.ToTable("productSizes");
                 });
 
             modelBuilder.Entity("Obchod.Server.Models.User", b =>
@@ -290,37 +229,6 @@ namespace Obchod.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
-                });
-
-            modelBuilder.Entity("Obchod.Server.Models.OrderItem", b =>
-                {
-                    b.HasOne("Obchod.Server.Models.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderID");
-
-                    b.HasOne("Obchod.Server.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Obchod.Server.Models.User", null)
-                        .WithMany("ShoppingCart")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Obchod.Server.Models.Order", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("Obchod.Server.Models.User", b =>
-                {
-                    b.Navigation("ShoppingCart");
                 });
 #pragma warning restore 612, 618
         }
