@@ -1,13 +1,14 @@
 import { Text, Image, Box, SimpleGrid } from '@mantine/core';
-import { Dropzone } from '@mantine/dropzone';
+import { Dropzone, FileWithPath } from '@mantine/dropzone';
 import { Product } from '../../lib/types';
 import { useEffect, useState } from 'react';
 import { useAxiosClient } from '../../lib/api/axios-client';
 
-export default function ImageDropzone({ product,form }: { product: Product | null, form : any}) {
+export default function ImageDropzone({ product, form }: { product: Product | null, form: any }) {
     const [paths, setPaths] = useState<string[]>([]);
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const axios = useAxiosClient();
+    const [files, setFiles] = useState<FileWithPath[]>([]);
 
     useEffect(() => {
         setPaths(product?.imagePaths || []);
@@ -16,13 +17,18 @@ export default function ImageDropzone({ product,form }: { product: Product | nul
 
     const handleDrop = async (files: File[]) => {
         for (const file of files) {
-            const formData = new FormData();
-            formData.append('images', file);
-            axios.post(`${API_URL}/api/Product/${product?.productID}/images`, formData).then((response) =>
-            {
-                setPaths(response.data.imagePaths)
-                form.setFieldValue("imagesPaths", response.data.imagePaths)
-            });
+            if (product != null) {
+                const formData = new FormData();
+                formData.append('images', file);
+                axios.post(`${API_URL}/api/Product/${product?.productID}/images`, formData).then((response) => {
+                    setPaths(response.data.imagePaths)
+                    form.setFieldValue("imagesPaths", response.data.imagePaths)
+                });
+            } else {
+                form.setFieldValue("images", files);
+                form.setFieldValue("imagesPaths", ["asd"])
+                setFiles(files);
+            }
         }
     };
 
@@ -50,8 +56,13 @@ export default function ImageDropzone({ product,form }: { product: Product | nul
             </Dropzone>
 
             <SimpleGrid cols={{ base: 1, sm: 4 }} mt={previews.length > 0 ? 'xs' : 0}>
-                {previews}
+                {product == null ? files.map((file, index) => {
+                    const imageUrl = URL.createObjectURL(file);
+                    return <Image key={index} src={imageUrl} onLoad={() => URL.revokeObjectURL(imageUrl)} />;
+                }) : previews}
             </SimpleGrid>
+            <Text c="red">{form.errors["imagesPaths"] ?? ""}</Text>
+
         </Box>
     );
 }

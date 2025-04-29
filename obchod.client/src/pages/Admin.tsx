@@ -17,26 +17,36 @@ function Admin() {
     const [created, setCreated] = useState(false);
 
     useQuerySuccess(productResult, async (data: any) => {
-        console.log()
         setProducts(data)
     })
 
 
-    const handleSubmit = async (formData: {}, productId?: number) => {
-        await axios.put(`/api/product/${productId}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+    const handleSubmit = async (formData: [], productId?: number) => {
+        const data = new FormData();
+
+        //@ts-ignore
+        Object.keys(formData).forEach((key : any) => {
+            if (Array.isArray(formData[key])) {
+                formData[key].forEach((file: File) => {
+                    data.append(key, file);
+                });
+            } else {
+                data.append(key, formData[key]);
+            }
         });
-        productResult.refetch();
-    };
 
 
-    const handleClose = () => {
-        if (created && selectedProduct != null) { 
-            axios.delete(`/api/product/${selectedProduct.productID}`);
-            productResult.refetch();
+        if (created) {
+            await axios.post(`/api/product/`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+        } else {
+            await axios.put(`/api/product/${productId}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
         }
-        close();
-        setSelectedProduct(null)
+
+        productResult.refetch(); 
     };
 
     const handleDelete = async (productId: number) => {
@@ -45,13 +55,8 @@ function Admin() {
     }
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const createProduct = () => {
-        axios.get('/api/Product/create').then((response) => {
-            const newProducts = response.data;
-            setProducts(newProducts);
-            setSelectedProduct(newProducts[newProducts.length - 1]);
-            setCreated(true);
-            open();
-        });
+        setCreated(true);
+        open();
     }
 
 

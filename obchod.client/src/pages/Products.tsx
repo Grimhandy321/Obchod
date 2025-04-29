@@ -14,8 +14,8 @@ const Products = () => {
     })
 
     return (
-        <Container style={{ paddingTop: '50px' }}>
-            {products ? <Grid gutter="md" justify="center">
+        <Container size="90%" >
+            {products ? <Grid gutter="md" justify="center" >
                 {products.map((product) => (
                     <Grid.Col key={product.productID} span={4}>
                         <ProductCard

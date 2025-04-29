@@ -50,21 +50,6 @@ namespace Obchod.Server.Controllers
         }
 
 
-        //  Create a new product
-     
-        [SessionAuthorize("Admin")]
-        [HttpGet("create")]
-        public async Task<IActionResult> Create()
-        {
-            _dbContext.products.Add(new Product {
-                Brand = "",
-                Name = "",
-                Description = ""
-            });
-            await _dbContext.SaveChangesAsync();
-            var products = await _dbContext.products.ToListAsync();
-            return Ok(products);
-        }
 
         //  Add a new product (Admin Only)
         [HttpPost]

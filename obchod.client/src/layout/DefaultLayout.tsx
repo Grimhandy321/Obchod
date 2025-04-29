@@ -19,7 +19,7 @@ export default function DefaultLayout() {
     return (
         <AppShell
             header={{ height: 60 }}
-            navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true } }}
+            navbar={{ width: 300,breakpoint: "xs", collapsed: { desktop: true } }}
             padding="md"
         >
             <AppShell.Header>

@@ -2,33 +2,39 @@ import React from 'react';
 import { Card, Image, Text, Button, Group, Rating } from '@mantine/core';
 import { useShoppingCartStore } from '../../lib/context/useShoppingCartStore';
 import { Product } from '../../lib/types';
-// Define the prop types for the ProductCard component
+import { IconPlus, IconMinus, IconTrash } from '@tabler/icons-react'; 
+
 interface ProductCardProps {
     product: Product
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({product}) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const API_URL = import.meta.env.VITE_API_BASE_URL;
     const addItem = useShoppingCartStore((state) => state.addItem);
+    const removeItem = useShoppingCartStore((state) => state.removeItem);
+    const updateQuantity = useShoppingCartStore((state) => state.updateQuantity);
+    const shoppingCart = useShoppingCartStore((state) => state.items);
+
+    const existingItem = shoppingCart.find(
+        (item) => item?.product?.productID === product.productID
+    );
 
     return (
         <Card
             shadow="sm"
             padding="lg"
             style={{
-                width: 250,
-                border: '2px solid white',  // White border added here
-                borderRadius: '8px',         // Rounded corners
-                transition: 'transform 0.2s ease', // Smooth transition for hover effect
+                border: '2px solid white', 
+                borderRadius: '8px', 
+                transition: 'transform 0.2s ease', 
             }}
         >
             <Card.Section>
-                {/* Product Image */}
                 <Image
                     src={`${API_URL}/${product.imagePaths[0]}`}
                     alt={product.name}
-                    height={200}
-                    fit="contain"
+
+                    fit={"fill"}
                 />
             </Card.Section>
 
@@ -43,14 +49,24 @@ const ProductCard: React.FC<ProductCardProps> = ({product}) => {
             <Text size="lg" style={{ marginTop: 10 }}>
                 ${product.price}
             </Text>
-
-            {/* Product Rating */}
             <Rating value={product.rating} readOnly style={{ marginTop: 5 }} />
 
-            <Group  style={{ marginTop: 15 }}>
-                <Button onClick={() => {
-                    addItem({ product: product,quantity:1 })
-                }}>Add to Cart</Button>
+            <Group style={{ marginTop: 15 }}>
+                {existingItem ? (
+                    <Group pb={"sm"}>
+                        <IconPlus onClick={() => updateQuantity(product.productID, existingItem.quantity + 1)} />
+                        {existingItem.quantity}
+                        <IconMinus onClick={() => updateQuantity(product.productID, existingItem.quantity - 1)}/>
+            
+                        <IconTrash color="red" onClick={() => removeItem(product.productID)} >
+                            Remove from Cart
+                        </IconTrash>
+                    </Group>
+                ) : (
+                    <Button onClick={() => addItem({ product: product, quantity: 1 })}>
+                        Add to Cart
+                    </Button>
+                )}
             </Group>
         </Card>
     );
