@@ -93,7 +93,7 @@ Všechny testovací scénáře byly úspěšně provedeny s očekávanými výsl
 3.  Instalace závislostí pro frontend:
    - Otevřete terminál ve složce obchod.client.
    - Spusťte příkaz npm install.
-4.Sestavení a spuštění aplikace:
+4. Sestavení a spuštění aplikace:
    - Ve Visual Studiu spusťte projekt Obchod.Server jako výchozí projekt.
    - Aplikace bude dostupná na http://localhost:5000 (nebo jiném konfigurovaném portu).
    
