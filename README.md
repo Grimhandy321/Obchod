@@ -85,3 +85,15 @@ Všechny testovací scénáře byly úspěšně provedeny s očekávanými výsl
    ```bash
    git clone https://github.com/Grimhandy321/Obchod.git
    cd Obchod
+2. Obnovení NuGet balíčků:
+   
+   - Otevřete řešení Obchod.sln ve Visual Studiu.
+   - Klikněte pravým tlačítkem na řešení a vyberte „Obnovit NuGet balíčky“.
+   - V nuget console spuste prikaz upddate-database
+3.  Instalace závislostí pro frontend:
+   - Otevřete terminál ve složce obchod.client.
+   - Spusťte příkaz npm install.
+4.Sestavení a spuštění aplikace:
+   - Ve Visual Studiu spusťte projekt Obchod.Server jako výchozí projekt.
+   - Aplikace bude dostupná na http://localhost:5000 (nebo jiném konfigurovaném portu).
+   
