@@ -4,9 +4,7 @@ import { useEffect } from 'react';
 import { Product } from '../../lib/types';
 import ImageDropzone from '../misc/ImageDropzone';
 import { productForm } from '../../lib/form/productForm';
-import { error } from 'node:console';
-import { create } from 'node:domain';
-import { useAxiosClient } from '../../lib/api/axios-client';
+
 interface ProductFormProps {
     initial: Product | null;
     onSubmit: (formData: {}, productId?: number) => void;
@@ -17,6 +15,8 @@ interface ProductFormProps {
 
 export function ProductForm({ initial, onSubmit, opened, close, created = false }: ProductFormProps) {
     const form = useForm(productForm);
+
+    console.log();
 
     useEffect(() => {
         if (initial) {
@@ -30,7 +30,7 @@ export function ProductForm({ initial, onSubmit, opened, close, created = false 
         } else {
             form.reset();
         }
-    }, []);
+    });
     const handleSubmit = () => {
         if (form.validate().hasErrors) {
             console.log(form.errors)
