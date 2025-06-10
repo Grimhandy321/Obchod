@@ -1,115 +1,99 @@
-Upravil jsem soubor README.md tak, aby správně odkazoval na appsettings.json ve složce Server. Můžete si jej stáhnout zde:
+# 🛒 Obchod – Internetový obchod
 
-Stáhnout README.md
+## 📌 Anotace
 
-Níže je upravený obsah:
+Projekt **Obchod** představuje webovou aplikaci internetového obchodu, postavenou na platformě ASP.NET Framework s využitím TypeScriptu. Cílem je vytvořit moderní a bezpečný e-shop s robustním backendem a typově bezpečným frontendem, který umožní uživatelům pohodlně nakupovat produkty online.
 
-# Obchod
+## 📝 Úvod
 
-**Obchod** je webová aplikace postavená na platformě ASP.NET Framework s využitím TypeScriptu. Tento projekt slouží jako základ pro vývoj moderních webových aplikací s robustním backendem a typově bezpečným frontendem.
+Internetový obchod **Obchod** je navržen jako plně funkční e-commerce platforma, která poskytuje uživatelům možnost prohlížet produkty, přidávat je do košíku a provádět objednávky. Backend aplikace je postaven na ASP.NET Frameworku 4.8, což zajišťuje stabilní a výkonné serverové prostředí. Frontend je vyvíjen v TypeScriptu, což přispívá k lepší udržovatelnosti a předcházení chybám během vývoje.
 
-## Požadavky
+Projekt je strukturován do dvou hlavních částí:
 
-- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
-- [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
-- [Node.js](https://nodejs.org/) (doporučujeme nejnovější LTS verzi)
-- [TypeScript](https://www.typescriptlang.org/)
+- **Obchod.Server**: Zajišťuje serverovou logiku, správu dat a API rozhraní.
+- **obchod.client**: Obsahuje klientskou část aplikace, která komunikuje s backendem a poskytuje uživatelské rozhraní.
 
-## Instalace
+Cílem tohoto projektu je nejen vytvořit funkční internetový obchod, ale také poskytnout základ pro další rozšiřování a přizpůsobení specifickým potřebám.
 
-1. **Klonování repozitáře:**
+## 📊 Ekonomická rozvaha
+
+### Konkurence
+
+Na trhu existuje mnoho e-commerce řešení, jako jsou Shopify, WooCommerce nebo Magento. Tyto platformy nabízejí širokou škálu funkcí, ale často jsou spojeny s vyššími náklady nebo omezenou možností přizpůsobení.
+
+### Výhody projektu Obchod
+
+- **Flexibilita**: Díky vlastnímu vývoji je možné aplikaci přizpůsobit konkrétním požadavkům bez omezení.
+- **Nákladová efektivita**: Absence licenčních poplatků a možnost hostování na vlastních serverech snižuje provozní náklady.
+- **Bezpečnost**: Použití moderních technologií a pravidelných aktualizací zajišťuje vysokou úroveň bezpečnosti.
+
+### Propagace
+
+- **Online marketing**: Využití sociálních sítí, SEO optimalizace a PPC kampaní.
+- **Spolupráce**: Navázání partnerství s blogery a influencery v oblasti e-commerce.
+- **Reference**: Vytvoření případových studií a prezentace úspěšných implementací.
+
+### Návratnost investic
+
+Předpokládá se, že investice do vývoje a propagace se vrátí během 12–18 měsíců, v závislosti na rozsahu a intenzitě marketingových aktivit.
+
+## 🛠️ Vývoj
+
+### Použité technologie
+
+- **Backend**: ASP.NET Framework 4.8
+- **Frontend**: TypeScript
+- **Vývojové prostředí**: Visual Studio 2022
+- **Další nástroje**: Node.js, NuGet balíčky
+
+### Struktura programu
+
+- **Obchod.Server**: Obsahuje kontrolery, modely a služby pro zpracování požadavků a správu dat.
+- **obchod.client**: Implementuje uživatelské rozhraní a logiku pro interakci s API.
+
+### Průběh vývoje
+
+Vývoj probíhal iterativně s důrazem na testování a validaci jednotlivých komponent. Dokumentace je průběžně aktualizována a kód je opatřen komentáři pro lepší srozumitelnost.
+
+## ✅ Testování
+
+### Testovací scénáře
+
+1. **Registrace uživatele**: Ověření funkčnosti registračního formuláře a validace vstupních dat.
+2. **Přihlášení uživatele**: Testování autentizace a správy relací.
+3. **Přidání produktu do košíku**: Kontrola správného přidání a aktualizace položek v košíku.
+4. **Proces objednávky**: Simulace celého procesu od výběru produktu po potvrzení objednávky.
+5. **Nasazení aplikace**: Ověření správné konfigurace a funkčnosti aplikace po nasazení na server.
+
+### Výsledky testování
+
+Všechny testovací scénáře byly úspěšně provedeny s očekávanými výsledky. Aplikace funguje stabilně a bez kritických chyb.
+
+## 🚀 Nasazení
+
+### Požadavky
+
+- **Visual Studio 2022**
+- **.NET Framework 4.8**
+- **Node.js** (doporučena nejnovější LTS verze)
+- **TypeScript**
+
+### Postup nasazení
+
+1. **Klonování repozitáře**:
 
    ```bash
    git clone https://github.com/Grimhandy321/Obchod.git
    cd Obchod
-
-	2.	Obnovení NuGet balíčků:
-	•	Otevřete řešení Obchod.sln ve Visual Studiu.
-	•	Klikněte pravým tlačítkem na řešení v Solution Exploreru a vyberte Restore NuGet Packages.
-	3.	Instalace npm balíčků:
-	•	Otevřete terminál ve složce projektu a spusťte:
-
-npm install
-
-
-
-Konfigurace databáze
-
-Před spuštěním aplikace je nutné nastavit připojení k databázi. Upravte connection string v souboru appsettings.json, který se nachází ve složce Server.
-	1.	Otevřete soubor Server/appsettings.json:
-	2.	Najděte sekci "ConnectionStrings":
-
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=.;Database=ObchodDb;Trusted_Connection=True;"
-  }
-}
-
-
-	3.	Upravte hodnotu "DefaultConnection" podle vašeho prostředí:
-	•	Server: Název vašeho SQL serveru.
-	•	Database: Název vaší databáze.
-	•	Trusted_Connection: Pokud nepoužíváte Windows autentizaci, nahraďte tuto položku User ID=USERNAME;Password=PASSWORD;.
-Příklad pro SQL autentizaci:
-
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=SERVER_NAME;Database=ObchodDb;User ID=USERNAME;Password=PASSWORD;"
-  }
-}
-
-Více informací o formátu connection stringu naleznete v dokumentaci Microsoftu.
-
-Inicializace databáze
-
-Pokud váš projekt využívá Entity Framework pro správu databáze, můžete ji inicializovat následujícím způsobem:
-	1.	Povolení migrací (pokud ještě nejsou povoleny):
-	•	Otevřete Package Manager Console ve Visual Studiu:
-	•	Tools → NuGet Package Manager → Package Manager Console
-	•	Spusťte příkaz:
-
-Enable-Migrations
-
-
-	2.	Vytvoření počáteční migrace:
-
-Add-Migration InitialCreate
-
-
-	3.	Aktualizace databáze podle migrací:
-
-Update-Database
-
-
-
-Tímto způsobem se vytvoří a nakonfiguruje databáze podle vašich modelů v projektu.
-
-Sestavení a spuštění
-	1.	Kompilace TypeScriptu:
-	•	V terminálu spusťte:
-
-tsc
-
-
-	•	Pro automatickou kompilaci při změnách použijte:
-
-tsc --watch
-
-
-	2.	Spuštění aplikace ve Visual Studiu:
-	•	Otevřete řešení Obchod.sln ve Visual Studiu.
-	•	Nastavte Obchod.Server jako startovací projekt.
-	•	Stiskněte F5 pro spuštění s laděním nebo Ctrl + F5 pro spuštění bez ladění.
-
-Struktura projektu
-	•	Server/ – Backendová část aplikace postavená na ASP.NET Framework.
-	•	Client/ – Frontendová část aplikace využívající TypeScript.
-	•	Instructions.txt – Další instrukce a poznámky k projektu.
-
----
-
-Soubor si můžete stáhnout zde:  
-
-[Stáhnout README.md](sandbox:/mnt/data/README.md?_chatgptios_conversationID=67b57f23-ab90-8002-8a60-a79c6fa00f53&_chatgptios_messageID=04fce578-1d3b-427b-9f27-8dfa6f8a3874)  
-
-Nyní je connection string správně umístěn do `appsettings.json` ve složce `Server`.
+2. Obnovení NuGet balíčků:
+   
+   - Otevřete řešení Obchod.sln ve Visual Studiu.
+   - Klikněte pravým tlačítkem na řešení a vyberte „Obnovit NuGet balíčky“.
+   - V nuget console spuste prikaz upddate-database
+3.  Instalace závislostí pro frontend:
+   - Otevřete terminál ve složce obchod.client.
+   - Spusťte příkaz npm install.
+4. Sestavení a spuštění aplikace:
+   - Ve Visual Studiu spusťte projekt Obchod.Server jako výchozí projekt.
+   - Aplikace bude dostupná na http://localhost:5000 (nebo jiném konfigurovaném portu).
+   
