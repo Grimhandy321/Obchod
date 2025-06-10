@@ -33,7 +33,38 @@ namespace Obchod.Server.Controllers
                 .ThenInclude(oi => oi.Product)
                 .ToList();
 
-            return Ok(orders);
+            var result = new List<object>();
+
+            for (int i = 0; i < orders.Count; i++)
+            {
+                var order = orders[i];
+                var user = _dbContext.users.FirstOrDefault(o => o.Id == order.UserID);
+                result.Add(new
+                {
+                    order.OrderID,
+                    order.DateTime,
+                    order.TotalPrice,
+                    order.Status,
+                    order.UserID,
+                    FirstName = user?.FirstName,
+                    LastName = user?.LastName,
+                    order.Address,
+                    order.Street,
+                    order.City,
+                    order.PostalCode,
+                    order.Country,
+                    OrderItems = order.OrderItems.Select(oi => new
+                    {
+                        oi.OrderItemID,
+                        oi.ProductID,
+                        ProductName = oi.Product.Name,
+                        ProductPrice = oi.Product.Price,
+                        oi.Quantity
+                    }).ToList()
+                });
+            }
+
+            return Ok(result);
         }
 
         //  Get Orders for the Logged-in User
@@ -84,7 +115,7 @@ namespace Obchod.Server.Controllers
 
             if (existingOrder == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Order not found " });
             }
 
             _dbContext.Entry(existingOrder).CurrentValues.SetValues(updatedOrder);

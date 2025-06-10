@@ -12,8 +12,8 @@ using Obchod.Server.Models;
 namespace Obchod.Server.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250405110446_oreder2")]
-    partial class oreder2
+    [Migration("20250501093944_fix")]
+    partial class fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,17 +58,36 @@ namespace Obchod.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderID"));
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UserID")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("OrderID");
@@ -84,7 +103,7 @@ namespace Obchod.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemID"));
 
-                    b.Property<int>("OrderID")
+                    b.Property<int?>("OrderID")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductID")
@@ -93,11 +112,16 @@ namespace Obchod.Server.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("OrderItemID");
 
                     b.HasIndex("OrderID");
 
                     b.HasIndex("ProductID");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("orderItems");
                 });
@@ -138,6 +162,63 @@ namespace Obchod.Server.Migrations
                     b.HasKey("ProductID");
 
                     b.ToTable("products");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductID = 1,
+                            Brand = "Sony",
+                            Count = 25,
+                            Description = "Kvalitní bezdrátová sluchátka s aktivním potlačením hluku.",
+                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\"]",
+                            Name = "Bezdrátová sluchátka",
+                            Price = 2999.99m,
+                            Rating = 4.5f
+                        },
+                        new
+                        {
+                            ProductID = 2,
+                            Brand = "Dell",
+                            Count = 10,
+                            Description = "Výkonný notebook ideální na práci i hraní her.",
+                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
+                            Name = "Notebook 15\"",
+                            Price = 23999.00m,
+                            Rating = 4.7f
+                        },
+                        new
+                        {
+                            ProductID = 3,
+                            Brand = "Apple",
+                            Count = 40,
+                            Description = "Stylové chytré hodinky s měřením zdravotních funkcí.",
+                            ImagePaths = "[\"cat.png\"]",
+                            Name = "Chytré hodinky",
+                            Price = 10999.50m,
+                            Rating = 4.8f
+                        },
+                        new
+                        {
+                            ProductID = 4,
+                            Brand = "JBL",
+                            Count = 100,
+                            Description = "Kompaktní reproduktor s mohutným zvukem a odolností proti vodě.",
+                            ImagePaths = "[\"cat.png\",\"cat.png\"]",
+                            Name = "Bluetooth reproduktor",
+                            Price = 1499.99m,
+                            Rating = 4.4f
+                        },
+                        new
+                        {
+                            ProductID = 5,
+                            Brand = "Logitech",
+                            Count = 75,
+                            Description = "Přesná herní myš s nastavitelnou citlivostí a RGB podsvícením.",
+                            ImagePaths = "[\"cat.png\",\"cat.png\",\"cat.png\",\"cat.png\"]",
+                            Name = "Herní myš",
+                            Price = 1299.00m,
+                            Rating = 4.6f
+                        });
                 });
 
             modelBuilder.Entity("Obchod.Server.Models.User", b =>
@@ -212,21 +293,48 @@ namespace Obchod.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "0",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "30ad636b-a277-4a3e-b086-8f98642b4fa9",
+                            CreatedDate = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4406),
+                            Email = "michal.jezek07@gmail.com",
+                            EmailConfirmed = false,
+                            FirstName = "Michal",
+                            IsAdmin = true,
+                            LastLogin = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4469),
+                            LastName = "Prihoda",
+                            LockoutEnabled = false,
+                            ModifiedDate = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4467),
+                            NormalizedEmail = "",
+                            NormalizedUserName = "",
+                            PasswordHash = "",
+                            PhoneNumber = "",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f9d14cef-d16b-4ed1-86fc-ae29c28a69b4",
+                            TwoFactorEnabled = false,
+                            UserName = ""
+                        });
                 });
 
             modelBuilder.Entity("Obchod.Server.Models.OrderItem", b =>
                 {
                     b.HasOne("Obchod.Server.Models.Order", "Order")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrderID");
 
                     b.HasOne("Obchod.Server.Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Obchod.Server.Models.User", null)
+                        .WithMany("ShoppingCart")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Order");
 
@@ -236,6 +344,11 @@ namespace Obchod.Server.Migrations
             modelBuilder.Entity("Obchod.Server.Models.Order", b =>
                 {
                     b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("Obchod.Server.Models.User", b =>
+                {
+                    b.Navigation("ShoppingCart");
                 });
 #pragma warning restore 612, 618
         }

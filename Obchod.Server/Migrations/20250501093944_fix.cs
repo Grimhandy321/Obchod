@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Obchod.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class inicial : Migration
+    public partial class fix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,7 +38,7 @@ namespace Obchod.Server.Migrations
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    UserID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -106,7 +106,7 @@ namespace Obchod.Server.Migrations
                 {
                     OrderItemID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderID = table.Column<int>(type: "int", nullable: false),
+                    OrderID = table.Column<int>(type: "int", nullable: true),
                     ProductID = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
@@ -118,8 +118,7 @@ namespace Obchod.Server.Migrations
                         name: "FK_orderItems_orders_OrderID",
                         column: x => x.OrderID,
                         principalTable: "orders",
-                        principalColumn: "OrderID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "OrderID");
                     table.ForeignKey(
                         name: "FK_orderItems_products_ProductID",
                         column: x => x.ProductID,
@@ -144,6 +143,11 @@ namespace Obchod.Server.Migrations
                     { 4, "JBL", 100, "Kompaktní reproduktor s mohutným zvukem a odolností proti vodě.", "[\"cat.png\",\"cat.png\"]", "Bluetooth reproduktor", 1499.99m, 4.4f },
                     { 5, "Logitech", 75, "Přesná herní myš s nastavitelnou citlivostí a RGB podsvícením.", "[\"cat.png\",\"cat.png\",\"cat.png\",\"cat.png\"]", "Herní myš", 1299.00m, 4.6f }
                 });
+
+            migrationBuilder.InsertData(
+                table: "users",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "CreatedDate", "Email", "EmailConfirmed", "FirstName", "IsAdmin", "LastLogin", "LastName", "LockoutEnabled", "LockoutEnd", "ModifiedDate", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "0", 0, "30ad636b-a277-4a3e-b086-8f98642b4fa9", new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4406), "michal.jezek07@gmail.com", false, "Michal", true, new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4469), "Prihoda", false, null, new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4467), "", "", "", "", false, "f9d14cef-d16b-4ed1-86fc-ae29c28a69b4", false, "" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_orderItems_OrderID",

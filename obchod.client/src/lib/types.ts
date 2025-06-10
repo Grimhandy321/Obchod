@@ -7,22 +7,42 @@ export interface Product {
     rating: number;
     imagePaths: string[];
 }
-export interface CartItem{
+
+export interface CartItem {
     product: Product;
     quantity: number;
 }
 
 export type Status = 'error' | 'success';
 
-export interface Order {
-    orderID: number;
-    status: number;
-    orderItems: OrderItem[];
-    dateTime: string;
-}
+export type OrderStatus =
+    | 'Pending'
+    | 'Processing'
+    | 'Shipped'
+    | 'CancellePending'
+    | 'Delivered'
+    | 'Cancelled';
 
 export interface OrderItem {
-    id: number;
-    product: Product;
+    orderItemID: number;
+    productID: number;
+    productName: string;
+    productPrice: number;
     quantity: number;
+}
+
+export interface Order {
+    orderID: number;
+    status: number; // enum index from backend
+    orderItems: OrderItem[];
+    dateTime: string;
+    totalPrice: number;
+    userID: string;
+    firstName: string;
+    lastName: string;
+    address: string;
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
 }

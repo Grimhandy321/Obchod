@@ -290,6 +290,31 @@ namespace Obchod.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "0",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "30ad636b-a277-4a3e-b086-8f98642b4fa9",
+                            CreatedDate = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4406),
+                            Email = "michal.jezek07@gmail.com",
+                            EmailConfirmed = false,
+                            FirstName = "Michal",
+                            IsAdmin = true,
+                            LastLogin = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4469),
+                            LastName = "Prihoda",
+                            LockoutEnabled = false,
+                            ModifiedDate = new DateTime(2025, 5, 1, 11, 33, 44, 797, DateTimeKind.Local).AddTicks(4467),
+                            NormalizedEmail = "",
+                            NormalizedUserName = "",
+                            PasswordHash = "",
+                            PhoneNumber = "",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "f9d14cef-d16b-4ed1-86fc-ae29c28a69b4",
+                            TwoFactorEnabled = false,
+                            UserName = ""
+                        });
                 });
 
             modelBuilder.Entity("Obchod.Server.Models.OrderItem", b =>
